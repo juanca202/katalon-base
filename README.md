@@ -94,8 +94,7 @@ El framework está construido con Playwright + TypeScript y sigue las mejores pr
 - `npm test` - Ejecutar todas las pruebas y generar el reporte Allure (`allure-report/`)
 - `npm run test:e2e` - Solo pruebas E2E (con reporte Allure)
 - `npm run test:api` - Solo pruebas de API (con reporte Allure)
-- `npm run test:browser` - Solo los browsers de escritorio (Chromium, Firefox, WebKit)
-- `npm run test:mobile` - Solo los viewports móviles (Chrome Mobile, Safari Mobile)
+- `npm run test:mobile` - Solo el viewport móvil (Chrome Mobile)
 - `npm run test:human` - Solo pruebas Human-in-the-Loop (`@human`): Chromium y un worker; browser visible solo con `@visible`
 - `npm run test:headed` - Ejecutar con browser visible
 - `npm run test:ui` - Interfaz interactiva de Playwright
@@ -124,7 +123,7 @@ El framework está construido con Playwright + TypeScript y sigue las mejores pr
 
 ## Proyectos de Playwright
 
-Definidos en [playwright.config.ts](playwright.config.ts): `chromium`, `firefox`, `webkit`, `Mobile Chrome` (Pixel 5), `Mobile Safari` (iPhone 12) y `api-tests` (pruebas de API con `API_BASE_URL`). Para correr uno solo: `npx playwright test --project=chromium`. Las pruebas de otro motor (por ejemplo Maestro) irían en su propia carpeta, `tests/maestro/`.
+Definidos en [playwright.config.ts](playwright.config.ts): `chromium` (Chrome de escritorio), `Mobile Chrome` (Pixel 5) y `api-tests` (pruebas de API con `API_BASE_URL`). Para correr uno solo: `npx playwright test --project=chromium`. Firefox, WebKit y Mobile Safari están deshabilitados de momento. Las pruebas de otro motor (por ejemplo Maestro) irían en su propia carpeta, `tests/maestro/`.
 
 ## Convenciones de pruebas
 

@@ -73,38 +73,28 @@ export default defineConfig({
     trace: 'on',
 
     // Video only for scenarios that need it; override per test/project (ADR-007)
-    video: 'off',
+    video: 'on',
 
     // Screenshot only for scenarios that need it; override per test/project (ADR-007)
-    screenshot: 'off',
+    screenshot: 'on',
 
     // Browser context options
     viewport: { width: 1280, height: 720 },
     ignoreHTTPSErrors: true,
   },
 
-  // Configure projects for major browsers
+  // Por ahora solo Chrome (escritorio y móvil). Para reactivar otros browsers,
+  // agregar proyectos con devices['Desktop Firefox'], devices['Desktop Safari']
+  // o devices['iPhone 12'].
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
     // Mobile viewports
     {
       name: 'Mobile Chrome',
       use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
     },
     // API Testing project
     {
