@@ -58,7 +58,7 @@ export abstract class BasePage {
    * Click element with retry
    */
   async click(selector: string, retries = 3): Promise<void> {
-    await test.step(`Clic en "${selector}"`, async () => {
+    await test.step(`Click on "${selector}"`, async () => {
       for (let i = 0; i < retries; i++) {
         try {
           await this.waitForElement(selector);
@@ -76,7 +76,7 @@ export abstract class BasePage {
    * Fill input field
    */
   async fill(selector: string, value: string): Promise<void> {
-    await test.step(`Ingresar texto en "${selector}"`, async () => {
+    await test.step(`Fill "${selector}"`, async () => {
       const element = await this.waitForElement(selector);
       await element.clear();
       await element.fill(value);
