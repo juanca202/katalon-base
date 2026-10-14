@@ -123,7 +123,7 @@ El framework está construido con Playwright + TypeScript y sigue las mejores pr
 
 ## Proyectos de Playwright
 
-Definidos en [playwright.config.ts](playwright.config.ts): `chromium` (Chrome de escritorio), `Mobile Chrome` (Pixel 5) y `api-tests` (pruebas de API con `API_BASE_URL`). Para correr uno solo: `npx playwright test --project=chromium`. Firefox, WebKit y Mobile Safari están deshabilitados de momento. Las pruebas de otro motor (por ejemplo Maestro) irían en su propia carpeta, `tests/maestro/`.
+Definidos en [playwright.config.ts](playwright.config.ts): `chromium` (Chrome de escritorio), `Mobile Chrome` (Pixel 5) y `api-tests` (pruebas de API con `API_BASE_URL`). Para correr uno solo: `npx playwright test --project=chromium`. Firefox, WebKit y Mobile Safari están deshabilitados de momento. Las apps nativas o híbridas de Android e iOS se prueban con Maestro, en su propia carpeta, `tests/maestro/` ([ADR-011](docs/adr/ADR-011-maestro-mobile-app-runner.md)).
 
 ## Convenciones de pruebas
 
