@@ -2,14 +2,15 @@
 name: Testing Standards
 domain: testing
 status: Active
-last_update: 2026-10-05
-source_adrs: [ADR-003, ADR-005, ADR-006, ADR-007, ADR-008, ADR-009, ADR-010]
-tags: [testing, msw, azure-devops, allure, human-in-the-loop]
+last_update: 2026-10-14
+source_adrs:
+  [ADR-003, ADR-005, ADR-006, ADR-007, ADR-008, ADR-009, ADR-010, ADR-011]
+tags: [testing, msw, azure-devops, allure, human-in-the-loop, maestro, mobile]
 ---
 
 # Testing Standards
 
-Este estándar cubre las pruebas automatizadas del framework de QA: estructura, Page Objects, esperas, datos, aserciones, reintentos, tiempos, mocks HTTP, APIs REST y GraphQL, evidencias de ejecución, trazabilidad con Test Cases de Azure DevOps, reportería con Allure, jerarquía Historia, Criterio y Caso de prueba, y tipos de prueba (Fully Automated y Human-in-the-Loop).
+Este estándar cubre las pruebas automatizadas del framework de QA: estructura, Page Objects, esperas, datos, aserciones, reintentos, tiempos, mocks HTTP, APIs REST y GraphQL, evidencias de ejecución, trazabilidad con Test Cases de Azure DevOps, reportería con Allure, jerarquía Historia, Criterio y Caso de prueba, tipos de prueba (Fully Automated y Human-in-the-Loop) y pruebas de apps móviles nativas o híbridas con Maestro.
 
 ## Estructura de pruebas
 
@@ -218,6 +219,19 @@ La suite por defecto (`npm test`) **NO DEBE** ejecutar pruebas `@human`. Estas *
 
 Ninguna.
 
+## Pruebas de apps móviles nativas o híbridas
+
+**ID:** mobile-app-testing
+**Estado:** Active
+
+Las pruebas de aplicaciones nativas o híbridas Android e iOS **DEBEN** ejecutarse con Maestro y **DEBEN** escribirse como flujos YAML en `tests/maestro/`. Playwright **NO DEBE** usarse para probar apps nativas o híbridas; su viewport móvil solo cubre la web.
+
+Los resultados de Maestro **DEBEN** exportarse en formato JUnit y publicarse en cada ejecución del pipeline, de modo que la asociación con el Test Case siga el requisito `azure-devops-traceability`.
+
+### Excepciones
+
+Ninguna.
+
 ## Criterios de cumplimiento
 
 | ID     | Requisito                      | Descripción                                                                                                                                                               | Automatizable | Enfoque    | Verificación                                                |
@@ -239,6 +253,8 @@ Ninguna.
 | CR-016 | test-types                     | La suite por defecto **NO DEBE** ejecutar pruebas `@human`, y estas **DEBEN** correr con una configuración dedicada (un worker, browser visible solo con `@visible`)      | yes           | bloqueante | Pending                                                     |
 | CR-017 | test-types                     | El input manual **DEBE** solicitarse con `askHuman()` y **NO DEBE** leerse con `readline` o `stdin` directo en las pruebas                                                | yes           | bloqueante | Pending                                                     |
 | CR-018 | test-types                     | Todo Test Case **DEBE** declarar su tipo (Fully Automated o Human-in-the-Loop) y, si es Human-in-the-Loop, **DEBE** indicar en sus pasos qué input se ingresa manualmente | no            | —          | Pending                                                     |
+| CR-019 | mobile-app-testing             | Las pruebas de apps nativas o híbridas Android e iOS **DEBEN** ejecutarse con Maestro y vivir como flujos YAML en `tests/maestro/`                                        | yes           | bloqueante | [checks/testing.mjs](../../scripts/arch/checks/testing.mjs) |
+| CR-020 | mobile-app-testing             | Los resultados de Maestro **DEBEN** publicarse en formato JUnit en cada ejecución del pipeline                                                                            | yes           | bloqueante | [checks/testing.mjs](../../scripts/arch/checks/testing.mjs) |
 
 ## Referencias
 
@@ -250,3 +266,4 @@ Ninguna.
 - [ADR-008: Trazabilidad entre pruebas automatizadas y Test Cases de Azure DevOps](../adr/ADR-008-azure-devops-test-case-traceability.md)
 - [ADR-009: Allure como capa de reportería y jerarquía Historia → Criterio → Caso de prueba](../adr/ADR-009-allure-reporting-and-traceability-hierarchy.md)
 - [ADR-010: Tipos de prueba Fully Automated y Human-in-the-Loop](../adr/ADR-010-human-in-the-loop-tests.md)
+- [ADR-011: Maestro como runner de pruebas de apps Android e iOS](../adr/ADR-011-maestro-mobile-app-runner.md)

@@ -7,7 +7,7 @@
 // =============================================================================
 import { readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
+import { dirname, join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { colorStatus } from '../lib/colors.mjs';
 
@@ -48,7 +48,8 @@ const REQUIRED_CLIENTS = [
 
 function severity(rule) {
   if (rule === 'error' || rule === 2) return 'error';
-  if (Array.isArray(rule) && (rule[0] === 'error' || rule[0] === 2)) return 'error';
+  if (Array.isArray(rule) && (rule[0] === 'error' || rule[0] === 2))
+    return 'error';
   return null;
 }
 
@@ -56,12 +57,17 @@ function restrictedNames(rule) {
   const options = Array.isArray(rule) ? rule[1] : undefined;
   const paths = options?.paths;
   if (!Array.isArray(paths)) return [];
-  return paths.map(entry => (typeof entry === 'string' ? entry : entry?.name)).filter(Boolean);
+  return paths
+    .map(entry => (typeof entry === 'string' ? entry : entry?.name))
+    .filter(Boolean);
 }
 
 function coversApiTests(files) {
   const list = Array.isArray(files) ? files : [files];
-  return list.some(pattern => typeof pattern === 'string' && pattern.includes('tests/playwright/api'));
+  return list.some(
+    pattern =>
+      typeof pattern === 'string' && pattern.includes('tests/playwright/api')
+  );
 }
 
 // --- CR-003 (bloqueante) -----------------------------------------------------
@@ -80,7 +86,9 @@ check(
     }
     const rule = block.rules?.['no-restricted-imports'];
     if (severity(rule) !== 'error') {
-      throw new Error('no-restricted-imports no está en severidad error para tests/playwright/api.');
+      throw new Error(
+        'no-restricted-imports no está en severidad error para tests/playwright/api.'
+      );
     }
     const names = new Set(restrictedNames(rule));
     const missing = REQUIRED_CLIENTS.filter(name => !names.has(name));
@@ -99,10 +107,16 @@ function validTitleRule() {
   const block = config.find(
     entry =>
       entry.rules?.['playwright/valid-title'] &&
-      [entry.files].flat().some(pattern => typeof pattern === 'string' && pattern.includes('tests/'))
+      [entry.files]
+        .flat()
+        .some(
+          pattern => typeof pattern === 'string' && pattern.includes('tests/')
+        )
   );
   if (!block) {
-    throw new Error('No hay un bloque de ESLint con playwright/valid-title para tests/.');
+    throw new Error(
+      'No hay un bloque de ESLint con playwright/valid-title para tests/.'
+    );
   }
   const rule = block.rules['playwright/valid-title'];
   if (severity(rule) !== 'error') {
@@ -125,8 +139,14 @@ check(
       throw new Error('mustMatch.test no está configurado.');
     }
     const re = new RegExp(pattern, 'u');
-    if (!re.test('TC-1234: User can login') || re.test('User can login') || re.test('TC-abc: x')) {
-      throw new Error(`mustMatch.test (${pattern}) no exige el prefijo TC-<id>:.`);
+    if (
+      !re.test('TC-1234: User can login') ||
+      re.test('User can login') ||
+      re.test('TC-abc: x')
+    ) {
+      throw new Error(
+        `mustMatch.test (${pattern}) no exige el prefijo TC-<id>:.`
+      );
     }
   }
 );
@@ -145,7 +165,9 @@ check(
     }
     const re = new RegExp(pattern, 'u');
     if (!re.test('TC-1: a TC-2') || re.test('TC-1: a')) {
-      throw new Error(`mustNotMatch.test (${pattern}) no prohíbe más de un TC-<id>.`);
+      throw new Error(
+        `mustNotMatch.test (${pattern}) no prohíbe más de un TC-<id>.`
+      );
     }
   }
 );
@@ -160,7 +182,9 @@ check(
   () => {
     const source = readFileSync(join(repoRoot, 'playwright.config.ts'), 'utf8');
     if (!/\[\s*['"](junit|json)['"]/.test(source)) {
-      throw new Error("playwright.config.ts no declara un reporter 'junit' ni 'json'.");
+      throw new Error(
+        "playwright.config.ts no declara un reporter 'junit' ni 'json'."
+      );
     }
   }
 );
@@ -182,8 +206,7 @@ check(
   'warning',
   'specs agrupados con acceptanceCriterion() y títulos US-<id>: / AC-<id>:',
   () => {
-    const call =
-      /acceptanceCriterion\(\s*(['"`])(.*?)\1\s*,\s*(['"`])(.*?)\3/s;
+    const call = /acceptanceCriterion\(\s*(['"`])(.*?)\1\s*,\s*(['"`])(.*?)\3/s;
     const problems = [];
     for (const dir of ['tests/playwright/e2e', 'tests/playwright/api']) {
       for (const file of specFiles(join(repoRoot, dir))) {
@@ -199,6 +222,73 @@ check(
       }
     }
     if (problems.length > 0) throw new Error(problems.join('\n'));
+  }
+);
+
+function mobileFlowFiles(dir, found = []) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (
+      [
+        'node_modules',
+        '.git',
+        'dist',
+        'test-results',
+        'allure-results',
+        'allure-report',
+      ].includes(entry.name)
+    )
+      continue;
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) mobileFlowFiles(path, found);
+    else if (
+      /\.ya?ml$/.test(entry.name) &&
+      /^\s*appId\s*:/m.test(readFileSync(path, 'utf8'))
+    )
+      found.push(path);
+  }
+  return found;
+}
+
+const MAESTRO_DIR = join(repoRoot, 'tests', 'maestro');
+const mobileFlows = mobileFlowFiles(repoRoot);
+
+// --- CR-019 (bloqueante) -----------------------------------------------------
+// Las pruebas de apps Android e iOS DEBEN ejecutarse con Maestro y vivir como
+// flujos YAML en tests/maestro/. Un flujo Maestro (YAML con appId:) fuera de esa
+// carpeta es una violación. Sin flujos, el criterio se cumple.
+check(
+  'CR-019',
+  'bloqueante',
+  'flujos Maestro (YAML con appId) solo dentro de tests/maestro/',
+  () => {
+    const outside = mobileFlows
+      .filter(file => !file.startsWith(MAESTRO_DIR + sep))
+      .map(file => file.slice(repoRoot.length + 1));
+    if (outside.length > 0) {
+      throw new Error(`Flujos fuera de tests/maestro/:\n${outside.join('\n')}`);
+    }
+  }
+);
+
+// --- CR-020 (bloqueante) -----------------------------------------------------
+// Los resultados de Maestro DEBEN publicarse en formato JUnit en cada ejecución
+// del pipeline. Si hay flujos, azure-pipelines.yml debe invocar maestro con
+// formato junit. Sin flujos, el criterio se cumple.
+check(
+  'CR-020',
+  'bloqueante',
+  'pipeline publica resultados JUnit de Maestro (azure-pipelines.yml)',
+  () => {
+    if (mobileFlows.length === 0) return;
+    const pipeline = readFileSync(
+      join(repoRoot, 'azure-pipelines.yml'),
+      'utf8'
+    );
+    if (!/maestro[^\n]*--format[ =]+junit/i.test(pipeline)) {
+      throw new Error(
+        "azure-pipelines.yml no ejecuta 'maestro test --format junit'."
+      );
+    }
   }
 );
 
