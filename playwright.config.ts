@@ -31,6 +31,11 @@ export default defineConfig({
       {
         outputFolder: 'allure-results',
         suiteTitle: true,
+        // Muestra el paso a paso: test.step, hooks, fixtures, expect y
+        // llamadas de Playwright (page.goto, click, fill, etc.)
+        detail: true,
+        // Adjunta al reporte screenshots, videos y traces de cada prueba
+        includeAttachments: true,
         categories: [
           {
             name: 'Ignored tests',

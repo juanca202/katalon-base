@@ -1,7 +1,7 @@
 ---
 id: ADR-009
 status: Accepted
-last_update: 2026-10-02
+last_update: 2026-10-13
 deciders: [Equipo de QA]
 tags: [testing, reporting, allure, traceability, azure-pipelines]
 supersedes: null
@@ -27,6 +27,7 @@ Se adopta Allure 3 como herramienta de reportería, complementaria al reporte HT
 
 - El reporter `allure-playwright` escribe los resultados en `allure-results/` y el CLI `allure` genera el reporte. `npm test`, `test:e2e` y `test:api` ejecutan Playwright envuelto con `allure run`, de modo que cada ejecución genera el reporte.
 - La configuración vive en `allurerc.mjs`. El historial de ejecuciones se guarda en `.allure/history.jsonl`, lo que habilita tendencias y detección de tests inestables.
+- El reporter se configura con `detail: true` e `includeAttachments: true` para mostrar el paso a paso (hooks, `expect`, llamadas de Playwright y `test.step`) y los adjuntos. Los Page Objects envuelven sus acciones en `test.step()` con nombres legibles.
 - Las categorías de fallos (infraestructura, tests desactualizados, defectos de producto, ignorados) se definen en la configuración del reporter.
 - En CI (Azure Pipelines) el historial se persiste entre ejecuciones con `Cache@2`, y el reporte se publica como artefacto junto con el JUnit y las evidencias.
 

@@ -175,6 +175,8 @@ El framework **DEBE** generar un reporte de Allure en cada ejecución de pruebas
 
 El pipeline **DEBERÍA** conservar el historial de Allure entre ejecuciones y **DEBE** publicar el reporte como artefacto.
 
+El reporter `allure-playwright` **DEBE** tener `detail: true` para que el reporte muestre el paso a paso de cada prueba. Las acciones de negocio de los Page Objects y de las pruebas **DEBERÍAN** envolverse en `test.step()` con un nombre legible, de modo que cada Test Case se lea como una secuencia de pasos en Allure.
+
 Allure **NO DEBE** reemplazar el reporte de Playwright como herramienta de análisis de traces: el trace sigue abriéndose con Playwright Trace Viewer.
 
 ### Excepciones

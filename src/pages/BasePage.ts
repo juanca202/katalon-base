@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, test } from '@playwright/test';
 
 /**
  * Base Page Object Model class
@@ -58,25 +58,29 @@ export abstract class BasePage {
    * Click element with retry
    */
   async click(selector: string, retries = 3): Promise<void> {
-    for (let i = 0; i < retries; i++) {
-      try {
-        await this.waitForElement(selector);
-        await this.page.locator(selector).click();
-        return;
-      } catch (error) {
-        if (i === retries - 1) throw error;
-        await this.page.waitForTimeout(1000);
+    await test.step(`Clic en "${selector}"`, async () => {
+      for (let i = 0; i < retries; i++) {
+        try {
+          await this.waitForElement(selector);
+          await this.page.locator(selector).click();
+          return;
+        } catch (error) {
+          if (i === retries - 1) throw error;
+          await this.page.waitForTimeout(1000);
+        }
       }
-    }
+    });
   }
 
   /**
    * Fill input field
    */
   async fill(selector: string, value: string): Promise<void> {
-    const element = await this.waitForElement(selector);
-    await element.clear();
-    await element.fill(value);
+    await test.step(`Ingresar texto en "${selector}"`, async () => {
+      const element = await this.waitForElement(selector);
+      await element.clear();
+      await element.fill(value);
+    });
   }
 
   /**
