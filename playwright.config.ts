@@ -30,7 +30,8 @@ export default defineConfig({
       'allure-playwright',
       {
         outputFolder: 'allure-results',
-        suiteTitle: true,
+        // Sin suite por archivo: el árbol lo define allurerc.mjs (groupBy)
+        suiteTitle: false,
         // Muestra el paso a paso: test.step, hooks, fixtures, expect y
         // llamadas de Playwright (page.goto, click, fill, etc.)
         detail: true,
@@ -94,11 +95,13 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: '**/api/**',
       use: { ...devices['Desktop Chrome'] },
     },
     // Mobile viewports
     {
       name: 'Mobile Chrome',
+      testIgnore: '**/api/**',
       use: { ...devices['Pixel 5'] },
     },
     // API Testing project

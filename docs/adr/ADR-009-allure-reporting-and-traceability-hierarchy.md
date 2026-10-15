@@ -43,6 +43,30 @@ US-001: Acceso al portal
       └── TC-33801: credenciales inválidas muestran el mismo error
 ```
 
+Además, el helper fija las etiquetas de Allure y `allurerc.mjs` (`groupBy`) agrupa el árbol del reporte con el tipo de prueba como elemento principal: Tipo → Plataforma (solo en E2E) → Historia → Criterio → Caso de prueba.
+
+| Nivel | Etiqueta      | Origen                                                                                   |
+| ----- | ------------- | ---------------------------------------------------------------------------------------- |
+| 1     | `parentSuite` | Carpeta del spec: `e2e/` → E2E, `api/` → API                                             |
+| 2     | `suite`       | Solo E2E; proyecto de Playwright: `chromium` → Web desktop, `Mobile Chrome` → Web mobile |
+| 3     | `feature`     | Historia (`US-<id>: …`)                                                                  |
+| 4     | `story`       | Criterio de aceptación (`AC-<id>: …`)                                                    |
+| 5     | Caso          | Título de la prueba (`TC-<id>: …`)                                                       |
+
+```
+E2E
+ └── Web desktop
+      └── US-001: Acceso al portal
+           └── AC-001: Autenticación y acceso al portal
+                └── TC-33801: credenciales inválidas muestran el mismo error
+API
+ └── US-002: Gestión de usuarios
+      └── AC-004: Alta de usuario
+           └── TC-1234: crear usuario devuelve 201
+```
+
+Las pruebas de API no tienen plataforma, por lo que omiten el nivel 2. El reporter se configura con `suiteTitle: false` para que no agregue un nivel por archivo. Las pruebas de Maestro (E2E en plataforma Mobile) llegan por JUnit y no pasan por el helper, por lo que su ubicación en el árbol depende de un script puente de resultados que escriba esas mismas etiquetas.
+
 Esta decisión extiende ADR-007 y ADR-008 sin reemplazarlos.
 
 ## Alternativas consideradas
