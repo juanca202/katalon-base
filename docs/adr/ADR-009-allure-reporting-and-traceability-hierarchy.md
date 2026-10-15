@@ -45,13 +45,13 @@ US-001: Acceso al portal
 
 Además, el helper fija las etiquetas de Allure y `allurerc.mjs` (`groupBy`) agrupa el árbol del reporte con el tipo de prueba como elemento principal: Tipo → Plataforma (solo en E2E) → Historia → Criterio → Caso de prueba.
 
-| Nivel | Etiqueta      | Origen                                                                                   |
-| ----- | ------------- | ---------------------------------------------------------------------------------------- |
-| 1     | `parentSuite` | Carpeta del spec: `e2e/` → E2E, `api/` → API                                             |
-| 2     | `suite`       | Solo E2E; proyecto de Playwright: `chromium` → Web desktop, `Mobile Chrome` → Web mobile |
-| 3     | `feature`     | Historia (`US-<id>: …`)                                                                  |
-| 4     | `story`       | Criterio de aceptación (`AC-<id>: …`)                                                    |
-| 5     | Caso          | Título de la prueba (`TC-<id>: …`)                                                       |
+| Nivel | Etiqueta      | Origen                                                               |
+| ----- | ------------- | -------------------------------------------------------------------- |
+| 1     | `parentSuite` | `metadata.type` del proyecto de Playwright (`E2E` o `API`)           |
+| 2     | `suite`       | `metadata.platform` del proyecto (solo E2E): Web desktop, Web mobile |
+| 3     | `feature`     | Historia (`US-<id>: …`)                                              |
+| 4     | `story`       | Criterio de aceptación (`AC-<id>: …`)                                |
+| 5     | Caso          | Título de la prueba (`TC-<id>: …`)                                   |
 
 ```
 E2E

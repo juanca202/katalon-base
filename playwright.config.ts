@@ -95,18 +95,21 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      metadata: { type: 'E2E', platform: 'Web desktop' },
       testIgnore: '**/api/**',
       use: { ...devices['Desktop Chrome'] },
     },
     // Mobile viewports
     {
       name: 'Mobile Chrome',
+      metadata: { type: 'E2E', platform: 'Web mobile' },
       testIgnore: '**/api/**',
       use: { ...devices['Pixel 5'] },
     },
     // API Testing project
     {
       name: 'api-tests',
+      metadata: { type: 'API' },
       testDir: './tests/playwright/api',
       use: {
         baseURL: process.env.API_BASE_URL || 'https://api.example.com',
