@@ -138,7 +138,7 @@ Si el sistema bajo prueba no permite borrar un recurso, la prueba no usa ese rec
 
 El framework **DEBE** generar automáticamente evidencias y artefactos de ejecución.
 
-Toda ejecución automatizada **DEBE** producir evidencia, tanto si la prueba pasa como si falla. El tipo de evidencia principal se selecciona según el tipo de prueba: Playwright Trace en E2E funcional, screenshot en regresión visual, evidencia estructurada (request, response y assertions) en API, y video en escenarios que requieren evidencia audiovisual.
+Toda ejecución automatizada **DEBE** producir evidencia, tanto si la prueba pasa como si falla. El tipo de evidencia principal se selecciona según el tipo de prueba: Playwright Trace en E2E funcional, screenshot en regresión visual, evidencia estructurada (request, response y assertions) en API, y video en escenarios que requieren evidencia audiovisual. En las apps nativas o híbridas ejecutadas con Maestro, las evidencias del flujo **DEBEN** guardarse en `test-results/maestro/`.
 
 En las pruebas E2E funcionales, el trace **DEBE** ser la evidencia principal y la configuración base **DEBE** capturarlo en todas las ejecuciones (`trace: 'on'`). Los screenshots y los videos **NO DEBEN** capturarse por defecto; una prueba que requiera otro tipo de evidencia **PUEDE** sobrescribir la configuración a nivel de test, `test.describe` o proyecto.
 

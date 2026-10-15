@@ -29,6 +29,7 @@ Se adopta una estrategia de evidencia basada en el tipo de prueba:
 | Regresión visual                               | Screenshot                                                              |
 | API                                            | Evidencia estructurada de la ejecución (request, response y assertions) |
 | Escenarios que requieren evidencia audiovisual | Video                                                                   |
+| App nativa o híbrida (Maestro)                 | Screenshots y comandos ejecutados del flujo                             |
 | Pruebas que requieren diagnóstico adicional    | Evidencia combinada                                                     |
 
 En las pruebas E2E funcionales, el Playwright Trace es la evidencia principal de la ejecución, tanto si la prueba termina correctamente como si termina con error.
@@ -53,6 +54,8 @@ En las pruebas de API la evidencia principal es una representación estructurada
 - **Resultado y duración** de la prueba.
 
 Las pruebas de API pueden usar las capacidades de tracing de Playwright cuando resulte útil para el diagnóstico, pero el Trace no es la evidencia principal del API testing. Esta evidencia estructurada se genera tanto si la prueba termina correctamente como si falla, porque su objetivo es demostrar la ejecución y alimentar los reportes automatizados.
+
+En las pruebas de apps nativas o híbridas con Maestro ([ADR-011](ADR-011-maestro-mobile-app-runner.md)), el resultado se exporta en JUnit a `allure-results/` y las evidencias del flujo (screenshots de `takeScreenshot`, `commands.json` y logs) se guardan en `test-results/maestro/` con `--test-output-dir`. El JUnit de Maestro no transporta adjuntos, por lo que en Allure se ve el resultado y la duración, y las evidencias se conservan como artefactos de ejecución.
 
 ### Criterios de selección
 
@@ -173,6 +176,7 @@ test('TC-1234: crear usuario devuelve 201', async ({ request }) => {
 ## Referencias
 
 - [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-011: Maestro como runner de pruebas de apps Android e iOS](ADR-011-maestro-mobile-app-runner.md)
 - [ADR-008: Trazabilidad entre pruebas automatizadas y Test Cases de Azure DevOps](ADR-008-azure-devops-test-case-traceability.md)
 - [Estándar de Testing](../standards/testing.md) — requisito «Evidencias de ejecución»
 - [Playwright Trace Viewer](https://playwright.dev/docs/trace-viewer)

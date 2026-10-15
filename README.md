@@ -94,7 +94,10 @@ El framework está construido con Playwright + TypeScript y sigue las mejores pr
 - `npm test` - Ejecutar todas las pruebas y generar el reporte Allure (`allure-report/`)
 - `npm run test:e2e` - Solo pruebas E2E (con reporte Allure)
 - `npm run test:api` - Solo pruebas de API (con reporte Allure)
-- `npm run test:mobile` - Solo el viewport móvil (Chrome Mobile)
+- `npm run test:desktop` - Web de escritorio (proyecto `chromium`)
+- `npm run test:web-mobile` - Web en viewport móvil (proyecto `Mobile Chrome`)
+- `npm run test:mobile` - Apps nativas o híbridas Android e iOS con Maestro (`tests/maestro/`): resultados JUnit a Allure y evidencias en `test-results/maestro/`
+- `npm run test:all` - Playwright (desktop, web-mobile y API) y Maestro en una sola ejecución, con un único reporte Allure
 - `npm run test:human` - Solo pruebas Human-in-the-Loop (`@human`): Chromium y un worker; browser visible solo con `@visible`
 - `npm run test:headed` - Ejecutar con browser visible
 - `npm run test:ui` - Interfaz interactiva de Playwright
