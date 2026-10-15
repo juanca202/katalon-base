@@ -1,5 +1,10 @@
 import { test } from '@playwright/test';
-import { allure } from 'allure-playwright';
+import {
+  feature,
+  parentSuite,
+  story as allureStory,
+  suite,
+} from 'allure-js-commons';
 
 /**
  * Agrupa pruebas bajo Historia -> Criterio de aceptación para que la
@@ -24,10 +29,10 @@ export function acceptanceCriterion(
     test.describe(criterion, () => {
       test.beforeEach(async () => {
         const { type, platform } = test.info().project.metadata;
-        await allure.parentSuite(type);
-        if (platform) await allure.suite(platform);
-        await allure.feature(story);
-        await allure.story(criterion);
+        await parentSuite(type);
+        if (platform) await suite(platform);
+        await feature(story);
+        await allureStory(criterion);
       });
 
       body();
