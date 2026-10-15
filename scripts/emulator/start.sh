@@ -5,7 +5,7 @@
 # Uso: scripts/emulator/start.sh [avd]
 # Variables: AVD_NAME (qa-pixel-35), ANDROID_API (35), ANDROID_IMAGE
 # (google_apis; google_apis_playstore para apps que exigen Google Play),
-# ANDROID_HOME y HEADLESS
+# ANDROID_HOME, HEADLESS, AVD_RAM (MB, 4096) y AVD_CORES (4)
 # (sin ventana; por defecto solo en CI, localmente se abre la ventana).
 set -euo pipefail
 
@@ -35,14 +35,31 @@ if ! emulator -list-avds | grep -qx "$AVD"; then
   echo no | avdmanager create avd -n "$AVD" -k "$IMAGE" -d pixel_6 --force >/dev/null
 fi
 
+# 2 GB de RAM (el valor por defecto) y render por software dejan a la app, Chrome
+# y Google Play sin memoria: el guest se cuelga y adb lo ve como "offline".
+CONFIG="$HOME/.android/avd/$AVD.avd/config.ini"
+set_config() {
+  if grep -q "^$1=" "$CONFIG"; then sed -i.bak "s|^$1=.*|$1=$2|" "$CONFIG"; else echo "$1=$2" >>"$CONFIG"; fi
+}
+if [ -f "$CONFIG" ] && ! adb devices | grep -q '^emulator-'; then
+  set_config hw.ramSize "${AVD_RAM:-4096}"
+  set_config hw.cpu.ncore "${AVD_CORES:-4}"
+  set_config hw.gpu.enabled yes
+  rm -f "$CONFIG.bak"
+fi
+
 if adb devices | grep -q '^emulator-'; then
   echo "Ya hay un emulador en ejecución."
   exit 0
 fi
 
 HEADLESS="${HEADLESS:-${CI:+true}}"
-FLAGS=(-avd "$AVD" -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect)
-[ "$HEADLESS" = "true" ] && FLAGS+=(-no-window)
+FLAGS=(-avd "$AVD" -no-audio -no-boot-anim -no-snapshot)
+if [ "$HEADLESS" = "true" ]; then
+  FLAGS+=(-no-window -gpu swiftshader_indirect)
+else
+  FLAGS+=(-gpu host)
+fi
 LOG="${TMPDIR:-/tmp}/emulator-$AVD.log"
 nohup emulator "${FLAGS[@]}" >"$LOG" 2>&1 &
 
