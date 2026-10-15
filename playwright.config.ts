@@ -30,7 +30,8 @@ export default defineConfig({
       'allure-playwright',
       {
         outputFolder: 'allure-results',
-        // Sin suite por archivo: el árbol lo define allurerc.mjs (groupBy)
+        // Sin etiqueta suite por archivo en la pestaña Suites (el árbol principal
+        // lo define groupBy en allurerc.mjs)
         suiteTitle: false,
         // Muestra el paso a paso: test.step, hooks, fixtures, expect y
         // llamadas de Playwright (page.goto, click, fill, etc.)

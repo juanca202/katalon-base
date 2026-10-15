@@ -48,7 +48,7 @@ Además, el helper fija las etiquetas de Allure y `allurerc.mjs` (`groupBy`) agr
 | Nivel | Etiqueta      | Origen                                                               |
 | ----- | ------------- | -------------------------------------------------------------------- |
 | 1     | `parentSuite` | `metadata.type` del proyecto de Playwright (`E2E` o `API`)           |
-| 2     | `suite`       | `metadata.platform` del proyecto (solo E2E): Web desktop, Web mobile |
+| 2     | `platform`    | `metadata.platform` del proyecto (solo E2E): Web desktop, Web mobile |
 | 3     | `feature`     | Historia (`US-<id>: …`)                                              |
 | 4     | `story`       | Criterio de aceptación (`AC-<id>: …`)                                |
 | 5     | Caso          | Título de la prueba (`TC-<id>: …`)                                   |
@@ -65,7 +65,7 @@ API
            └── TC-1234: crear usuario devuelve 201
 ```
 
-Las pruebas de API no tienen plataforma, por lo que omiten el nivel 2. El reporter se configura con `suiteTitle: false` para que no agregue un nivel por archivo. Las pruebas de Maestro (E2E en plataforma Mobile) llegan por JUnit y no pasan por el helper, por lo que su ubicación en el árbol depende de un script puente de resultados que escriba esas mismas etiquetas.
+Las pruebas de API no tienen plataforma, por lo que omiten el nivel 2. La plataforma se registra en una etiqueta propia (`platform`) y no en `suite`, porque `allure-playwright` rellena `suite` con el archivo del spec cuando no la recibe, y eso añadiría un nivel por archivo en las pruebas de API. Las pruebas de Maestro (E2E en plataforma Mobile) llegan por JUnit y no pasan por el helper, por lo que su ubicación en el árbol depende de un script puente de resultados que escriba esas mismas etiquetas.
 
 Esta decisión extiende ADR-007 y ADR-008 sin reemplazarlos.
 
