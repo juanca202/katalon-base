@@ -57,6 +57,19 @@ steps:
       BASE_URL: $(BASE_URL)
       API_BASE_URL: $(API_BASE_URL)
 
+  # Flujos de apps nativas o híbridas (ADR-011, CR-020): solo corren si hay flujos
+  # en tests/maestro/. Requiere un emulador o dispositivo disponible en el agente.
+  - script: |
+      if [ -d tests/maestro ] && [ -n "$(find tests/maestro -name '*.y*ml' -print -quit)" ]; then
+        curl -Ls "https://get.maestro.mobile.dev" | bash
+        export PATH="$HOME/.maestro/bin:$PATH"
+        maestro test tests/maestro --format junit --output test-results/maestro-junit.xml --test-output-dir test-results/maestro --flatten-debug-output
+      else
+        echo "Sin flujos en tests/maestro/; se omite Maestro."
+      fi
+    displayName: Ejecutar flujos Maestro
+    continueOnError: true
+
   - script: |
       mkdir -p "$(ALLURE_HISTORY_DIR)"
       cp .allure/history.jsonl "$(ALLURE_HISTORY_DIR)/history.jsonl"
@@ -72,6 +85,15 @@ steps:
       testResultsFiles: test-results/junit.xml
       mergeTestResults: true
       testRunTitle: Playwright - Build $(Build.BuildNumber)
+
+  - task: PublishTestResults@2
+    displayName: Publicar resultados JUnit de Maestro
+    condition: always()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: test-results/maestro-junit.xml
+      mergeTestResults: true
+      testRunTitle: Maestro - Build $(Build.BuildNumber)
 
   - task: PublishPipelineArtifact@1
     displayName: Publicar reporte de Allure
