@@ -49,6 +49,7 @@ Maestro cubre solo apps nativas o híbridas. Playwright sigue siendo el runner d
 - Un segundo motor que mantener: CLI de Maestro, emuladores o simuladores y su instalación en CI (iOS requiere agente macOS).
 - No comparte Page Objects, Allure ni el helper de trazabilidad de Playwright; la reportería y la trazabilidad se resuelven vía JUnit.
 - Menor control programático que un framework con código para lógica compleja.
+- El emulador (`npm run emulator:start`) usa una imagen de Google APIs sin Play Store: las apps que verifican la licencia de Google Play al abrir no corren en él y requieren un build de QA sin esa verificación o un dispositivo físico.
 
 ## Referencias
 

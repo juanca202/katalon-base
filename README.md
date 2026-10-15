@@ -121,6 +121,8 @@ El framework está construido con Playwright + TypeScript y sigue las mejores pr
 
 - `npm run install:browsers` - Instalar los browsers de Playwright
 - `npm run install:deps` - Instalar las dependencias del sistema de los browsers
+- `npm run emulator:start` - Arrancar el emulador Android `qa-pixel-35` (lo crea si no existe) y esperar a que inicie; requiere Android SDK y `ANDROID_HOME`. Variables: `AVD_NAME`, `ANDROID_API`, `HEADLESS`
+- `npm run emulator:stop` - Apagar el emulador en ejecución
 - `npm run clean` - Eliminar `dist`, `allure-results`, `allure-report` y `test-results`
 
 ## Proyectos de Playwright
