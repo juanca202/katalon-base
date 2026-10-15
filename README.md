@@ -95,7 +95,7 @@ El framework está construido con Playwright + TypeScript y sigue las mejores pr
 - `npm run test:api` - Solo pruebas de API (con reporte Allure)
 - `npm run test:web-desktop` - Web de escritorio (proyecto `chromium`)
 - `npm run test:web-mobile` - Web en viewport móvil (proyecto `Mobile Chrome`)
-- `npm run test:mobile` - Apps nativas o híbridas Android e iOS con Maestro (`tests/maestro/`): resultados JUnit a Allure y evidencias en `test-results/maestro/`
+- `npm run test:mobile` - Apps nativas o híbridas Android e iOS con Maestro (`tests/maestro/`): resultados JUnit a Allure y evidencias en `test-results/maestro/`. Con varios dispositivos conectados (por ejemplo el emulador y un teléfono), Maestro elige uno por su cuenta; fija el dispositivo con `MAESTRO_DEVICE=emulator-5554 npm run test:mobile` (ver `adb devices`)
 - `npm run test:all` - Playwright (desktop, web-mobile y API) y Maestro en una sola ejecución, con un único reporte Allure
 - `npm run test:human` - Solo pruebas Human-in-the-Loop (`@human`): Chromium y un worker; browser visible solo con `@visible`
 - Los scripts `test*` que generan reporte limpian `allure-results/` al iniciar (`npm run clean:results`), así que cada reporte contiene solo su ejecución; para combinar plataformas en un solo reporte use `test:all`
