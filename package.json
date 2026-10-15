@@ -28,6 +28,7 @@
     "install:browsers": "playwright install",
     "install:deps": "playwright install-deps",
     "emulator:start": "bash scripts/emulator/start.sh",
+    "emulator:start:play": "AVD_NAME=qa-pixel-35-play ANDROID_IMAGE=google_apis_playstore bash scripts/emulator/start.sh",
     "emulator:stop": "adb emu kill",
     "prepare": "husky",
     "quality:check": "npm run lint && npm run format:check && npm run build",

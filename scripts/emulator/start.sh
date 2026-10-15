@@ -3,7 +3,9 @@
 # termine de iniciar. Crea el AVD si no existe.
 #
 # Uso: scripts/emulator/start.sh [avd]
-# Variables: AVD_NAME (qa-pixel-35), ANDROID_API (35), ANDROID_HOME y HEADLESS
+# Variables: AVD_NAME (qa-pixel-35), ANDROID_API (35), ANDROID_IMAGE
+# (google_apis; google_apis_playstore para apps que exigen Google Play),
+# ANDROID_HOME y HEADLESS
 # (sin ventana; por defecto solo en CI, localmente se abre la ventana).
 set -euo pipefail
 
@@ -11,7 +13,8 @@ AVD="${1:-${AVD_NAME:-qa-pixel-35}}"
 API="${ANDROID_API:-35}"
 SDK="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
 case "$(uname -m)" in arm64 | aarch64) ABI=arm64-v8a ;; *) ABI=x86_64 ;; esac
-IMAGE="system-images;android-${API};google_apis;${ABI}"
+IMAGE_TAG="${ANDROID_IMAGE:-google_apis}"
+IMAGE="system-images;android-${API};${IMAGE_TAG};${ABI}"
 export PATH="$SDK/emulator:$SDK/platform-tools:$SDK/cmdline-tools/latest/bin:$PATH"
 
 for tool in emulator adb avdmanager sdkmanager; do
@@ -23,7 +26,12 @@ done
 
 if ! emulator -list-avds | grep -qx "$AVD"; then
   echo "Creando AVD $AVD ($IMAGE)..."
-  yes | sdkmanager --install "$IMAGE" >/dev/null
+  # `yes` termina con SIGPIPE al cerrar sdkmanager; con pipefail eso abortaría.
+  (yes || true) | sdkmanager --install "$IMAGE" >/dev/null || true
+  [ -d "$SDK/system-images/android-${API}/${IMAGE_TAG}/${ABI}" ] || {
+    echo "No se pudo instalar $IMAGE; reintenta o instálala desde Android Studio (SDK Manager)." >&2
+    exit 1
+  }
   echo no | avdmanager create avd -n "$AVD" -k "$IMAGE" -d pixel_6 --force >/dev/null
 fi
 
