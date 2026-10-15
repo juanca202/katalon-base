@@ -84,7 +84,6 @@ El framework está construido con Playwright + TypeScript y sigue las mejores pr
 4. **Ver reportes**:
    ```bash
    npm run allure:serve       # Genera el reporte Allure y lo abre en el navegador
-   npm run test:report        # Reporte HTML de Playwright
    ```
 
 ## Scripts disponibles
@@ -99,10 +98,10 @@ El framework está construido con Playwright + TypeScript y sigue las mejores pr
 - `npm run test:mobile` - Apps nativas o híbridas Android e iOS con Maestro (`tests/maestro/`): resultados JUnit a Allure y evidencias en `test-results/maestro/`
 - `npm run test:all` - Playwright (desktop, web-mobile y API) y Maestro en una sola ejecución, con un único reporte Allure
 - `npm run test:human` - Solo pruebas Human-in-the-Loop (`@human`): Chromium y un worker; browser visible solo con `@visible`
+- Los scripts `test*` que generan reporte limpian `allure-results/` al iniciar (`npm run clean:results`), así que cada reporte contiene solo su ejecución; para combinar plataformas en un solo reporte use `test:all`
 - `npm run test:headed` - Ejecutar con browser visible
 - `npm run test:ui` - Interfaz interactiva de Playwright
 - `npm run test:debug` - Modo debug
-- `npm run test:report` - Reporte HTML de Playwright
 
 ### Reportes
 
@@ -158,9 +157,8 @@ El detalle completo está en los [estándares](docs/standards/README.md).
 ## Reportes de ejecución
 
 - **Allure** (`allurerc.mjs`): el reporte se genera con `allure run` al terminar `npm test`. Guarda el historial en `.allure/history.jsonl`, lo que habilita tendencias y detección de tests inestables. Las categorías de fallos están en `playwright.config.ts`.
-- **Playwright HTML**: `npm run test:report`.
 - **JUnit**: `test-results/junit.xml`, en formato legible por máquina para publicarlo en Azure DevOps.
-- **Evidencias**: traces y demás artefactos en `test-results/`.
+- **Evidencias**: los adjuntos de cada prueba (trace, screenshot, video y evidencia de API en Playwright; screenshots, grabaciones y `commands.json` en Maestro) quedan en `allure-results/`, que es la fuente de la skill `generate-report`; los originales de Playwright, en `test-results/`.
 
 ## Integración continua
 

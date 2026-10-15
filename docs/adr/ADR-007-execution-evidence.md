@@ -55,7 +55,7 @@ En las pruebas de API la evidencia principal es una representación estructurada
 
 Las pruebas de API pueden usar las capacidades de tracing de Playwright cuando resulte útil para el diagnóstico, pero el Trace no es la evidencia principal del API testing. Esta evidencia estructurada se genera tanto si la prueba termina correctamente como si falla, porque su objetivo es demostrar la ejecución y alimentar los reportes automatizados.
 
-En las pruebas de apps nativas o híbridas con Maestro ([ADR-011](ADR-011-maestro-mobile-app-runner.md)), el resultado se exporta en JUnit a `allure-results/` y las evidencias del flujo (screenshots de `takeScreenshot`, `commands.json` y logs) se guardan en `test-results/maestro/` con `--test-output-dir`. El JUnit de Maestro no transporta adjuntos, por lo que en Allure se ve el resultado y la duración, y las evidencias se conservan como artefactos de ejecución.
+En las pruebas de apps nativas o híbridas con Maestro ([ADR-011](ADR-011-maestro-mobile-app-runner.md)), el runner guarda las evidencias de cada flujo (screenshots de `takeScreenshot`, grabaciones de `startRecording`, `commands.json` y logs) en `test-results/maestro/` con `--debug-output`, y el script `scripts/maestro/junit-to-allure.mjs` las copia como adjuntos a `allure-results/`. Así las evidencias de todas las plataformas quedan en un solo lugar, igual que las de Playwright, y alimentan el reporte de Allure y la skill `generate-report`.
 
 ### Criterios de selección
 

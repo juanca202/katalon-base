@@ -63,7 +63,8 @@ steps:
       if [ -d tests/maestro ] && [ -n "$(find tests/maestro -name '*.y*ml' -print -quit)" ]; then
         curl -Ls "https://get.maestro.mobile.dev" | bash
         export PATH="$HOME/.maestro/bin:$PATH"
-        maestro test tests/maestro --format junit --output test-results/maestro-junit.xml --test-output-dir test-results/maestro --flatten-debug-output
+        mkdir -p test-results/maestro
+        maestro test tests/maestro --format junit --output test-results/maestro/junit.xml --debug-output test-results/maestro --flatten-debug-output
       else
         echo "Sin flujos en tests/maestro/; se omite Maestro."
       fi
@@ -91,7 +92,7 @@ steps:
     condition: always()
     inputs:
       testResultsFormat: JUnit
-      testResultsFiles: test-results/maestro-junit.xml
+      testResultsFiles: test-results/maestro/junit.xml
       mergeTestResults: true
       testRunTitle: Maestro - Build $(Build.BuildNumber)
 

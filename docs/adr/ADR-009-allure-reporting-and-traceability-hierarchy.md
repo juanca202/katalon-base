@@ -23,7 +23,7 @@ Además, los identificadores de historia y de criterio se escribían con formato
 
 ### Allure 3 como capa de reportería
 
-Se adopta Allure 3 como herramienta de reportería, complementaria al reporte HTML de Playwright y no su reemplazo (el trace viewer sigue siendo de Playwright).
+Se adopta Allure 3 como herramienta de reportería y se retira el reporte HTML de Playwright: las evidencias se leen de `allure-results/`, que incluye los traces, que siguen abriéndose con el trace viewer de Playwright (`npx playwright show-trace`).
 
 - El reporter `allure-playwright` escribe los resultados en `allure-results/` y el CLI `allure` genera el reporte. `npm test`, `test:e2e` y `test:api` ejecutan Playwright envuelto con `allure run`, de modo que cada ejecución genera el reporte.
 - La configuración vive en `allurerc.mjs`. El historial de ejecuciones se guarda en `.allure/history.jsonl`, lo que habilita tendencias y detección de tests inestables.

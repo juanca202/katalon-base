@@ -49,7 +49,7 @@ Genera reportes de calidad basados en templates DTG disponibles en `docs/templat
 
 ### DTG-022 - Pantallas de soporte
 
-**Input requerido:** Códigos de las historias de usuario (US-XXX); las evidencias se leen de `playwright-report/` (ver "Proceso DTG-022")
+**Input requerido:** Códigos de las historias de usuario (US-XXX); las evidencias se leen de `allure-results/` (ver "Proceso DTG-022")
 **Template:** `docs/templates/DTG022-pantallas-de-soporte.md`
 **Descripción:** Documentación de pantallas y evidencias de soporte
 
@@ -244,7 +244,7 @@ Cabecera: `URL de la consulta` = la query de Azure usada (o enlace construido so
 
 ## Proceso DTG-045 - Informe final de pruebas
 
-La fuente de las métricas es el **Progress Report de Azure Test Plans**, consultado con el **MCP de Azure DevOps**. No se calculan a partir de `playwright-report/` ni de los `.md` locales: el informe final refleja lo que consta en Azure.
+La fuente de las métricas es el **Progress Report de Azure Test Plans**, consultado con el **MCP de Azure DevOps**. No se calculan a partir de `allure-results/` ni de los `.md` locales: el informe final refleja lo que consta en Azure.
 
 El Progress Report muestra: Tests Passed / Failed / Blocked / Not Run, Run %, Passed %, Failed %, progreso por Test Plan y por Test Suite, tendencia histórica de resultados, y estimaciones y tasa de ejecución.
 
@@ -279,7 +279,7 @@ Si el MCP no expone un dato (p. ej. el gráfico de tendencia o las estimaciones)
 
 ### 4. Coherencia con el repo (advertencia, no sustitución)
 
-Cruzar los TCs `Ready` de las US (`test-cases/README.md`) con los test points de Azure. Si hay TCs locales que no existen en Azure (o al revés), o las cifras de `playwright-report/` contradicen Azure, **informarlo en Observaciones**, sin corregir los números de Azure.
+Cruzar los TCs `Ready` de las US (`test-cases/README.md`) con los test points de Azure. Si hay TCs locales que no existen en Azure (o al revés), o las cifras de `allure-results/` contradicen Azure, **informarlo en Observaciones**, sin corregir los números de Azure.
 
 ### 5. Verificación previa a guardar
 
@@ -347,30 +347,31 @@ Reglas:
 
 ## Proceso DTG-022 - Pantallas de soporte
 
-Documenta, por historia de usuario, la evidencia de ejecución de sus casos. La evidencia sale de **`playwright-report/`** (reporte HTML de Playwright); no se le pide al usuario ni se toma de capturas sueltas.
+Documenta, por historia de usuario, la evidencia de ejecución de sus casos. La evidencia sale de **`allure-results/`** (resultados de Allure de la última ejecución); no se le pide al usuario ni se toma de capturas sueltas.
 
 ### 1. Entrada y alcance
 
 - Obligatorio: códigos `US-XXX` (Regla global). Los TCs de cada US se listan desde `docs/specs/changes/user-stories/US-XXX-*/test-cases/README.md`.
-- Verificar que exista `playwright-report/index.html`. Si no existe, avisar que hay que ejecutar las pruebas (`npm test`) y detenerse; no fabricar evidencia.
-- Informar la fecha/hora de la corrida (`startTime` del reporte) y avisar si es anterior a los últimos cambios de las pruebas.
+- Verificar que `allure-results/` exista y tenga archivos `*-result.json`. Si no, avisar que hay que ejecutar las pruebas (`npm test`, `npm run test:all` o el script de la plataforma) y detenerse; no fabricar evidencia.
+- Informar la fecha/hora de la corrida (`start` del primer resultado y `stop` del último, en milisegundos epoch) y avisar si es anterior a los últimos cambios de las pruebas.
+- Cada script `test*` limpia `allure-results/` al iniciar, así que contiene solo la última ejecución; si el usuario necesita varias plataformas debe haber corrido `npm run test:all`.
 
-### 2. Extraer la evidencia de `playwright-report/`
+### 2. Extraer la evidencia de `allure-results/`
 
-`index.html` embebe el reporte en `<script id="playwrightReportBase64">` como `data:application/zip;base64,…`. Extraerlo con un script temporal (en el scratchpad, no en el repo):
+Cada prueba es un `{uuid}-result.json`. Leerlos con un script temporal (en el scratchpad, no en el repo):
 
-1. Decodificar el zip y leer `report.json`: `files[]` con `fileName` (p. ej. `e2e/us-001/tc-001-….e2e.spec.ts`) y `fileId`.
-2. Por cada archivo, leer `{fileId}.json`: `tests[]` con `title` (empieza por `TC-XXX:`), `projectName` (chromium, firefox, webkit, Mobile Chrome, Mobile Safari, api-tests…), `outcome` y `results[].attachments[]` (`name`, `contentType`, `path` = `data/{sha1}.{ext}`).
-3. Los archivos adjuntos viven en `playwright-report/data/`. Tipos: `screenshot` (png), `video` (webm), `trace`, `error-context` (md), y request/response JSON de las pruebas API (ADR-007).
-4. Asociar cada prueba a su US y TC por la ruta (`…/us-XXX/tc-XXX-…`) y el prefijo `TC-XXX:` del título. Descartar pruebas de US no solicitadas.
+1. Campos de cada resultado: `name` (empieza por `TC-XXX:`), `status` (`passed`, `failed`, `broken`, `skipped`), `start` y `stop`, `statusDetails.message` y `statusDetails.trace` ante un fallo, `historyId`, `labels` y `steps`.
+2. Etiquetas (`labels[]`): `parentSuite` = tipo (`E2E` o `API`), `platform` = plataforma (solo E2E: `Web desktop`, `Web mobile`, `Mobile`), `feature` = historia (`US-XXX: título`), `story` = criterio (`AC-XXX: título`). El proyecto de Playwright está en `parameters` (`Project`), y la plataforma de Maestro en `parameters` (`Platform`: Android o iOS).
+3. Los adjuntos viven en la misma carpeta, referenciados por `source` (`{uuid}-attachment.{ext}`) en `attachments[]` y, sobre todo, dentro de `steps[].attachments[]` en cualquier nivel de anidación: recorrer los pasos recursivamente. Tipos: `screenshot` (png), `video` (webm), `trace` (zip, `application/vnd.allure.playwright-trace`), `api-evidence.json` (request, response y assertions de las pruebas API, ADR-007), y los de Maestro (`takeScreenshot/*.png`, `startRecording/*`, `commands.json` y `logs/maestro.log`), que `scripts/maestro/junit-to-allure.mjs` copia a `allure-results/`.
+4. Asociar cada prueba a su US y TC por la etiqueta `feature` (id `US-XXX`) y el prefijo `TC-XXX:` del nombre. Descartar pruebas de US no solicitadas.
 
-Si una prueba tiene varios `results` (reintentos), usar el último y anotar los reintentos.
+Una misma prueba puede aparecer varias veces (reintentos o proyectos distintos): agrupar por `historyId`, usar el resultado con `stop` más reciente y anotar los reintentos. Un mismo TC ejecutado en `Web desktop` y `Web mobile` son dos filas, una por plataforma.
 
 ### 3. Copiar la evidencia al entregable
 
-El reporte `.md` debe seguir legible aunque `playwright-report/` se regenere (se sobrescribe en cada corrida). Por eso:
+El reporte `.md` debe seguir legible aunque `allure-results/` se limpie (se vacía al iniciar cada ejecución). Por eso:
 
-- Copiar los adjuntos usados a `docs/reports/evidencias/{codigo-reporte}-{codigo-requerimiento}-{d-m-yyyy}/US-XXX/TC-XXX/` con nombre legible (`{proyecto}-screenshot.png`, `{proyecto}-video.webm`, `{proyecto}-request.json`…) y enlazarlos con rutas relativas desde el reporte.
+- Copiar los adjuntos usados a `docs/reports/evidencias/{codigo-reporte}-{codigo-requerimiento}-{d-m-yyyy}/US-XXX/TC-XXX/` con nombre legible (`{plataforma}-screenshot.png`, `{plataforma}-video.webm`, `{plataforma}-request.json`…) y enlazarlos con rutas relativas desde el reporte.
 - No editar ni reescribir el contenido de los adjuntos. Las cabeceras sensibles de las pruebas API ya vienen enmascaradas por el framework; si aparece un token o `Authorization` sin enmascarar, no copiarlo y avisar.
 - Si una prueba no tiene adjuntos (p. ej. `skipped`), registrarla igual con «Sin evidencia: {estado}» y no inventar pantallas.
 
@@ -378,15 +379,15 @@ El reporte `.md` debe seguir legible aunque `playwright-report/` se regenere (se
 
 La plantilla es un índice `Plataforma / tipo | Historia de usuario | Enlace a la suite de pruebas`, y su fila original usa `UX/Funcional × Android/iOS` (app móvil). Este proyecto es web:
 
-| Campo                        | Valor                                                                                                                                                                   |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plataforma / tipo            | `{projectName} · {E2E / API / Visual}` (p. ej. `chromium · E2E`, `Mobile Chrome · E2E`, `api-tests · API`) — una fila por US y combinación proyecto/tipo con resultados |
-| Historia de usuario          | `US-XXX: {título del README de la US}`                                                                                                                                  |
-| Enlace a la suite de pruebas | Enlace relativo a la sección de la US en el mismo documento, o a `docs/specs/changes/user-stories/US-XXX-*/test-cases/README.md`                                        |
+| Campo                        | Valor                                                                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Plataforma / tipo            | `{platform} · {tipo}` (p. ej. `Web desktop · E2E`, `Web mobile · E2E`, `Mobile · E2E`, `API`) — una fila por US y combinación plataforma/tipo con resultados |
+| Historia de usuario          | `US-XXX: {título del README de la US}`                                                                                                                       |
+| Enlace a la suite de pruebas | Enlace relativo a la sección de la US en el mismo documento, o a `docs/specs/changes/user-stories/US-XXX-*/test-cases/README.md`                             |
 
 Después del índice, añadir por cada US una sección `## US-XXX — {título}` y por cada TC:
 
-- Encabezado `### TC-XXX — {título}` y tabla `Proyecto | Resultado | Duración | Evidencia` (una fila por proyecto ejecutado; resultado = `passed / failed / skipped` según `outcome`).
+- Encabezado `### TC-XXX — {título}` y tabla `Plataforma | Resultado | Duración | Evidencia` (una fila por plataforma ejecutada; resultado = `passed / failed / broken / skipped` según `status`; duración = `stop - start`).
 - Las capturas como imágenes (`![TC-XXX screenshot]({ruta})`) y los videos, traces, request/response y `error-context` como enlaces.
 - Ante un fallo, incluir el mensaje de error del resultado y enlazar el trace.
 
