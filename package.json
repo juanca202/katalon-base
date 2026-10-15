@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "allure run -- playwright test",
-    "test:desktop": "allure run -- playwright test --project=chromium",
+    "test:web-desktop": "allure run -- playwright test --project=chromium",
     "test:web-mobile": "allure run -- playwright test --project='Mobile Chrome'",
     "test:mobile": "maestro test tests/maestro --format junit --output allure-results/maestro-junit.xml --test-output-dir test-results/maestro --flatten-debug-output; r=$?; allure generate allure-results; exit $r",
     "test:all": "playwright test; p=$?; maestro test tests/maestro --format junit --output allure-results/maestro-junit.xml --test-output-dir test-results/maestro --flatten-debug-output; m=$?; allure generate allure-results; exit $((p || m))",
