@@ -2,12 +2,20 @@
 // Ejecuta los flujos de Maestro generando JUnit y evidencias, y reintenta cuando
 // el driver del dispositivo no llegó a arrancar: en ese caso todos los flujos
 // fallan en milisegundos con `DeviceServerDiedException` sin haberse ejecutado.
+// Si no hay ningún flujo YAML, no invoca a Maestro: no hay prueba que ejecutar.
 //
 // Uso: node scripts/maestro/run.mjs <flujos> <salida> [-- <args de maestro>]
 // Variables: MAESTRO_DEVICE (serial del dispositivo), MAESTRO_RETRIES (1)
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+} from 'node:fs';
+import { basename, extname, join } from 'node:path';
 import process from 'node:process';
 
 const [flows, outDir, ...rest] = process.argv.slice(2);
@@ -16,6 +24,35 @@ if (!flows || !outDir) {
   process.exit(2);
 }
 const extra = rest[0] === '--' ? rest.slice(1) : rest;
+
+// config.yaml es la configuración del workspace, no un flujo ejecutable.
+function isFlowFile(name) {
+  const ext = extname(name).toLowerCase();
+  const base = name.toLowerCase();
+  return (
+    (ext === '.yaml' || ext === '.yml') &&
+    base !== 'config.yaml' &&
+    base !== 'config.yml'
+  );
+}
+
+function hasFlowFiles(target) {
+  if (!existsSync(target)) return false;
+  if (!statSync(target).isDirectory()) return isFlowFile(basename(target));
+  for (const entry of readdirSync(target, { withFileTypes: true })) {
+    if (entry.name.startsWith('.')) continue;
+    const path = join(target, entry.name);
+    if (entry.isDirectory() ? hasFlowFiles(path) : isFlowFile(entry.name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+if (!hasFlowFiles(flows)) {
+  console.log(`Maestro: no hay ninguna prueba creada en ${flows}`);
+  process.exit(0);
+}
 const retries = Number(process.env.MAESTRO_RETRIES ?? 1);
 const junit = join(outDir, 'junit.xml');
 
