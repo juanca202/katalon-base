@@ -1,8 +1,8 @@
-# Proyecto Base de QA
+# test-katalon
 
-Este es un framework de pruebas automatizadas diseñado para realizar testing de aplicaciones web y APIs REST sin acceso al código fuente. Proporciona una base sólida para implementar pruebas E2E y API testing.
+Pruebas automatizadas de [Tripot](https://factor.ec/tripot), un sistema web de administración de finanzas personales. El código de Tripot no vive en este repositorio: las pruebas se ejecutan contra la aplicación desplegada, cuya URL se toma de `BASE_URL` (y `API_BASE_URL` para la API) en el archivo `.env`.
 
-El framework está construido con Playwright + TypeScript y sigue las mejores prácticas de la industria para testing de aplicaciones externas, incluyendo patrones de Page Object Model, configuración multi-ambiente y reportería avanzada con Allure.
+El proyecto parte del proyecto base de QA ([test-base](https://github.com/juanca202/test-base)) y usa Playwright + TypeScript con Page Object Model, configuración por ambiente y reportería con Allure, con trazabilidad de cada prueba hacia sus Test Cases de Azure DevOps.
 
 ## Características principales
 

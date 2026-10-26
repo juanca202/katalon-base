@@ -37,9 +37,14 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 
 ## Browsers y Devices
 
-- **Chromium, Firefox, WebKit** - Testing multi-browser
-- **Mobile viewports** - Chrome Mobile, Safari Mobile
+- **Chromium** - Proyectos `chromium` (escritorio) y `Mobile Chrome` (Pixel 5); Firefox, WebKit y Mobile Safari deshabilitados por ahora
+- **Maestro** - Apps nativas o híbridas Android e iOS (`tests/maestro/`)
 - **Headless/Headed** - Configurable por ambiente
+
+## Sistema bajo prueba
+
+- **Tripot** (finanzas personales, web) - sistema externo; su código no vive en este repositorio
+- Las URLs y credenciales salen del `.env` (`BASE_URL`, `API_BASE_URL`, `TEST_USER_*`) vía `src/config/env.ts`; nunca se escriben en el código
 
 ## Arquitectura
 
