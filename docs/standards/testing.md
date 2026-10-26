@@ -2,15 +2,68 @@
 name: Testing Standards
 domain: testing
 status: Active
-last_update: 2026-10-14
+last_update: 2026-10-19
 source_adrs:
-  [ADR-003, ADR-005, ADR-006, ADR-007, ADR-008, ADR-009, ADR-010, ADR-011]
-tags: [testing, msw, azure-devops, allure, human-in-the-loop, maestro, mobile]
+  [
+    ADR-001,
+    ADR-003,
+    ADR-005,
+    ADR-006,
+    ADR-007,
+    ADR-008,
+    ADR-009,
+    ADR-010,
+    ADR-011,
+    ADR-012,
+  ]
+tags:
+  [
+    testing,
+    runners,
+    playwright,
+    msw,
+    azure-devops,
+    allure,
+    human-in-the-loop,
+    maestro,
+    mobile,
+  ]
 ---
 
 # Testing Standards
 
-Este estándar cubre las pruebas automatizadas del framework de QA: estructura, Page Objects, esperas, datos, aserciones, reintentos, tiempos, mocks HTTP, APIs REST y GraphQL, evidencias de ejecución, trazabilidad con Test Cases de Azure DevOps, reportería con Allure, jerarquía Historia, Criterio y Caso de prueba, tipos de prueba (Fully Automated y Human-in-the-Loop) y pruebas de apps móviles nativas o híbridas con Maestro.
+Este estándar cubre las pruebas automatizadas del framework de QA: runners disponibles, pruebas web desktop y web mobile, estructura, Page Objects, esperas, datos, aserciones, reintentos, tiempos, mocks HTTP, APIs REST y GraphQL, evidencias de ejecución, trazabilidad con Test Cases de Azure DevOps, reportería con Allure, jerarquía Historia, Criterio y Caso de prueba, tipos de prueba (Fully Automated y Human-in-the-Loop) y pruebas de apps móviles nativas o híbridas con Maestro.
+
+## Runners de pruebas
+
+**ID:** test-runners
+**Estado:** Active
+
+El framework dispone de los siguientes runners. Cada prueba automatizada **DEBE** ejecutarse con el runner que le corresponde según su tipo y **DEBE** vivir en la carpeta `tests/<runner>/` de ese runner:
+
+| Runner     | Se usa para                                                                | Carpeta             |
+| ---------- | -------------------------------------------------------------------------- | ------------------- |
+| Playwright | E2E web (incluido el viewport móvil de un navegador) y APIs REST y GraphQL | `tests/playwright/` |
+| Maestro    | Apps nativas o híbridas Android e iOS                                      | `tests/maestro/`    |
+
+Ningún runner es exclusivo del framework. Un runner nuevo **DEBE** registrarse en [ADR-001](../adr/ADR-001-test-runners.md) y en esta tabla antes de añadir su carpeta de pruebas.
+
+### Excepciones
+
+Ninguna.
+
+## Pruebas web desktop y web mobile
+
+**ID:** web-testing
+**Estado:** Active
+
+Las pruebas web **DEBEN** ejecutarse con Playwright en dos modalidades, cada una como proyecto de `playwright.config.ts`: web desktop (`chromium`, perfil `Desktop Chrome`) y web mobile (`Mobile Chrome`, perfil de dispositivo móvil `Pixel 5`). Las pruebas E2E **DEBERÍAN** escribirse una sola vez y ejecutarse en ambos proyectos.
+
+La web mobile es una emulación de viewport dentro del navegador: **NO DEBE** usarse para probar apps nativas o híbridas (requisito `mobile-app-testing`).
+
+### Excepciones
+
+Ninguna.
 
 ## Estructura de pruebas
 
@@ -255,9 +308,14 @@ Ninguna.
 | CR-018 | test-types                     | Todo Test Case **DEBE** declarar su tipo (Fully Automated o Human-in-the-Loop) y, si es Human-in-the-Loop, **DEBE** indicar en sus pasos qué input se ingresa manualmente | no            | —          | Pending                                                     |
 | CR-019 | mobile-app-testing             | Las pruebas de apps nativas o híbridas Android e iOS **DEBEN** ejecutarse con Maestro y vivir como flujos YAML en `tests/maestro/`                                        | yes           | bloqueante | [checks/testing.mjs](../../scripts/arch/checks/testing.mjs) |
 | CR-020 | mobile-app-testing             | Los resultados de Maestro **DEBEN** publicarse en formato JUnit en cada ejecución del pipeline                                                                            | yes           | bloqueante | [checks/testing.mjs](../../scripts/arch/checks/testing.mjs) |
+| CR-021 | test-runners                   | Toda prueba automatizada **DEBE** vivir en `tests/<runner>/`, donde `<runner>` es un runner declarado (`playwright`, `maestro`)                                           | yes           | bloqueante | [checks/testing.mjs](../../scripts/arch/checks/testing.mjs) |
+| CR-022 | test-runners                   | Un runner nuevo **DEBE** registrarse en ADR-001 y en el catálogo del estándar antes de añadir su carpeta de pruebas                                                       | no            | —          | Pending                                                     |
+
+| CR-023 | web-testing | `playwright.config.ts` **DEBE** declarar un proyecto de web desktop (perfil `Desktop`) y uno de web mobile (perfil de dispositivo móvil) | yes | bloqueante | [checks/testing.mjs](../../scripts/arch/checks/testing.mjs) |
 
 ## Referencias
 
+- [ADR-001: Runners de pruebas: Playwright y Maestro](../adr/ADR-001-test-runners.md)
 - [ADR-002: Page Object Model como Patrón de Diseño](../adr/ADR-002-page-object-model-pattern.md)
 - [ADR-003: Mock Service Worker para mocks de APIs HTTP](../adr/ADR-003-msw-http-mocks.md)
 - [ADR-005: APIRequestContext de Playwright para pruebas REST y GraphQL](../adr/ADR-005-playwright-api-request-context.md)
@@ -267,3 +325,4 @@ Ninguna.
 - [ADR-009: Allure como capa de reportería y jerarquía Historia → Criterio → Caso de prueba](../adr/ADR-009-allure-reporting-and-traceability-hierarchy.md)
 - [ADR-010: Tipos de prueba Fully Automated y Human-in-the-Loop](../adr/ADR-010-human-in-the-loop-tests.md)
 - [ADR-011: Maestro como runner de pruebas de apps Android e iOS](../adr/ADR-011-maestro-mobile-app-runner.md)
+- [ADR-012: Playwright para pruebas web desktop y web mobile](../adr/ADR-012-playwright-web-desktop-and-mobile.md)

@@ -1,7 +1,7 @@
 ---
 id: ADR-011
 status: Accepted
-last_update: 2026-10-14
+last_update: 2026-10-19
 deciders: [Equipo de QA]
 tags: [testing, maestro, mobile, android, ios]
 supersedes: null
@@ -13,21 +13,15 @@ emits: [testing/CR-019, testing/CR-020]
 
 ## Contexto
 
-El framework prueba aplicaciones externas sin acceso al código fuente. Playwright ([ADR-001](ADR-001-playwright-as-testing-framework.md)) cubre web y APIs, pero solo emula viewports móviles de un navegador: no ejecuta apps nativas ni híbridas instaladas en Android o iOS. Si la app a probar es nativa o híbrida de Android o iOS, se debe usar Maestro.
-
-Probar apps nativas o híbridas sin acceso al código exige un runner de caja negra que:
+El reparto de runners está en [ADR-001](ADR-001-test-runners.md). Este ADR detalla el de las apps nativas o híbridas de Android e iOS, que sin acceso al código exige un runner de caja negra que:
 
 - Interactúe con la app mediante la UI accesible, sin instrumentarla ni recompilarla.
 - Use una misma definición de flujo para Android e iOS.
 - Tenga una barrera de entrada baja para QA, con flujos declarativos y resultados exportables a un formato legible por máquina.
 
-El README ya reservaba `tests/maestro/` para este motor, pero la decisión no estaba registrada.
-
 ## Decisión
 
-Las pruebas de aplicaciones móviles nativas o híbridas (Android e iOS) usan **Maestro** como runner. Los flujos se escriben como archivos YAML declarativos y viven en `tests/maestro/`, junto a las pruebas de Playwright pero en carpeta propia, una por motor de pruebas.
-
-Maestro cubre solo apps nativas o híbridas. Playwright sigue siendo el runner de E2E web y de API, incluido el viewport móvil de Chrome. Los resultados de Maestro se exportan en formato JUnit para integrarse con la publicación de resultados y la trazabilidad por Test Case del pipeline ([ADR-008](ADR-008-azure-devops-test-case-traceability.md)).
+Las pruebas de aplicaciones móviles nativas o híbridas (Android e iOS) usan **Maestro** como runner. Los flujos se escriben como archivos YAML declarativos y viven en `tests/maestro/`. Los resultados de Maestro se exportan en formato JUnit para integrarse con la publicación de resultados y la trazabilidad por Test Case del pipeline ([ADR-008](ADR-008-azure-devops-test-case-traceability.md)).
 
 ## Alternativas consideradas
 
@@ -56,6 +50,6 @@ Maestro cubre solo apps nativas o híbridas. Playwright sigue siendo el runner d
 ## Referencias
 
 - [Testing Standards](../standards/testing.md): requisito `mobile-app-testing`
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [ADR-008: Trazabilidad entre pruebas automatizadas y Test Cases de Azure DevOps](ADR-008-azure-devops-test-case-traceability.md)
 - [Documentación de Maestro](https://docs.maestro.dev)

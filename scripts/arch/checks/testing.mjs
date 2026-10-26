@@ -292,4 +292,56 @@ check(
   }
 );
 
+// --- CR-021 (bloqueante) -----------------------------------------------------
+// Toda prueba automatizada DEBE vivir en tests/<runner>/, donde <runner> es un
+// runner declarado. Un runner nuevo se añade a DECLARED_RUNNERS junto con su ADR.
+const DECLARED_RUNNERS = ['playwright', 'maestro'];
+
+check(
+  'CR-021',
+  'bloqueante',
+  `tests/ contiene solo carpetas de runners declarados (${DECLARED_RUNNERS.join(', ')})`,
+  () => {
+    const undeclared = readdirSync(join(repoRoot, 'tests'), {
+      withFileTypes: true,
+    })
+      .filter(
+        entry => !entry.isDirectory() || !DECLARED_RUNNERS.includes(entry.name)
+      )
+      .map(entry => `tests/${entry.name}`);
+    if (undeclared.length > 0) {
+      throw new Error(
+        `Fuera de un runner declarado:\n${undeclared.join('\n')}`
+      );
+    }
+  }
+);
+
+// --- CR-023 (bloqueante) -----------------------------------------------------
+// playwright.config.ts DEBE declarar un proyecto de web desktop (perfil Desktop)
+// y uno de web mobile (perfil de dispositivo móvil). Audita el archivo de forma
+// estática, ignorando comentarios; no ejecuta Playwright.
+check(
+  'CR-023',
+  'bloqueante',
+  'proyectos web desktop y web mobile declarados en playwright.config.ts',
+  () => {
+    const source = readFileSync(join(repoRoot, 'playwright.config.ts'), 'utf8')
+      .replace(/^\s*\/\*[\s\S]*?\*\//gm, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+    const missing = [];
+    if (!/devices\[\s*['"]Desktop [^'"]+['"]\s*\]/.test(source)) {
+      missing.push('proyecto web desktop (devices["Desktop ..."])');
+    }
+    if (
+      !/devices\[\s*['"](Pixel|Galaxy|iPhone|iPad)[^'"]*['"]\s*\]/.test(source)
+    ) {
+      missing.push('proyecto web mobile (devices["Pixel ..."] o similar)');
+    }
+    if (missing.length > 0) {
+      throw new Error(`Faltan en playwright.config.ts:\n${missing.join('\n')}`);
+    }
+  }
+);
+
 process.exit(blockingFailures > 0 ? 1 : 0);

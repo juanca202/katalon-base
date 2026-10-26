@@ -64,6 +64,6 @@ Las reglas continuas que esta decisión pone en vigor viven en el requisito «Tr
 
 ## Referencias
 
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [ADR-007: Evidencias y artefactos de ejecución](ADR-007-execution-evidence.md)
 - [Estándar de Testing](../standards/testing.md) — requisito «Trazabilidad con Test Cases de Azure DevOps»

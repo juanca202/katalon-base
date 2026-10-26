@@ -1,12 +1,13 @@
 # Proyecto Base de QA
 
-Este es un framework de pruebas automatizadas diseñado para realizar testing de aplicaciones web y APIs REST sin acceso al código fuente. Proporciona una base sólida para implementar pruebas E2E y API testing.
+Este es un framework de pruebas automatizadas diseñado para realizar testing de aplicaciones web, APIs y apps móviles nativas o híbridas sin acceso al código fuente. Proporciona una base sólida para implementar pruebas E2E, API y de apps móviles.
 
-El framework está construido con Playwright + TypeScript y sigue las mejores prácticas de la industria para testing de aplicaciones externas, incluyendo patrones de Page Object Model, configuración multi-ambiente y reportería avanzada con Allure.
+El framework dispone de dos runners ([ADR-001](docs/adr/ADR-001-test-runners.md)): Playwright + TypeScript para E2E web y API, y Maestro para apps nativas o híbridas Android e iOS. Sigue las mejores prácticas de la industria para testing de aplicaciones externas, incluyendo patrones de Page Object Model, configuración multi-ambiente y reportería avanzada con Allure.
 
 ## Características principales
 
-- 🎭 **Playwright + TypeScript**: Framework moderno para testing E2E y API
+- 🎭 **Playwright + TypeScript**: Runner para testing E2E web y API
+- 📱 **Maestro**: Runner para apps nativas o híbridas Android e iOS
 - 📊 **Allure Reports**: Reportería avanzada con categorización de fallos, historial y tendencias
 - 🌐 **Multi-browser**: Soporte para Chromium, Firefox, Safari y móviles
 - 🔧 **Configuración flexible**: Variables por ambiente y configuración modular

@@ -175,7 +175,7 @@ test('TC-1234: crear usuario devuelve 201', async ({ request }) => {
 
 ## Referencias
 
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [ADR-011: Maestro como runner de pruebas de apps Android e iOS](ADR-011-maestro-mobile-app-runner.md)
 - [ADR-008: Trazabilidad entre pruebas automatizadas y Test Cases de Azure DevOps](ADR-008-azure-devops-test-case-traceability.md)
 - [Estándar de Testing](../standards/testing.md) — requisito «Evidencias de ejecución»

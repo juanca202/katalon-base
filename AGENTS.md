@@ -10,7 +10,7 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 # Reglas generales
 
 - Este es un proyecto de QA para testing de aplicaciones externas sin acceso al código fuente
-- Utilizar Playwright + TypeScript para pruebas E2E y API testing
+- Runners disponibles ([ADR-001](docs/adr/ADR-001-test-runners.md)): Playwright + TypeScript para E2E web y API testing (`tests/playwright/`), y Maestro para apps nativas o híbridas Android e iOS (`tests/maestro/`)
 - Seguir patrones de Page Object Model para estructurar las pruebas
 - Mantener reportes claros usando Allure para documentación de resultados
 - Configurar pruebas para múltiples browsers y viewports
@@ -20,7 +20,8 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 
 ## Framework Principal
 
-- **Playwright 1.63.0** - Framework de testing E2E y API
+- **Playwright 1.63.0** - Runner de pruebas E2E web y API
+- **Maestro** - Runner de pruebas de apps nativas o híbridas Android e iOS
 - **TypeScript 6.0.3** - Lenguaje principal con type safety
 - **Node.js 20+** - Runtime environment
 

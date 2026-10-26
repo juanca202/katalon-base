@@ -54,5 +54,5 @@ Adoptamos el **Page Object Model (POM)** como patrón de diseño principal para 
 
 ## Referencias
 
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [Estándar de Testing](../standards/testing.md)

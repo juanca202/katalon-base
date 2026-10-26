@@ -4,7 +4,7 @@ Este directorio contiene las decisiones de arquitectura importantes del proyecto
 
 <!-- arch-manage añade aquí una línea por ADR creado: `- [ADR-XXX: Título](ADR-XXX-slug.md)`. No reordenar ni eliminar entradas manualmente. -->
 
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [ADR-002: Page Object Model como Patrón de Diseño](ADR-002-page-object-model-pattern.md)
 - [ADR-003: Mock Service Worker para mocks de APIs HTTP](ADR-003-msw-http-mocks.md)
 - [ADR-004: Conventional Commits con commitlint y Husky](ADR-004-conventional-commits.md)
@@ -15,6 +15,7 @@ Este directorio contiene las decisiones de arquitectura importantes del proyecto
 - [ADR-009: Allure como capa de reportería y jerarquía Historia → Criterio → Caso de prueba](ADR-009-allure-reporting-and-traceability-hierarchy.md)
 - [ADR-010: Tipos de prueba Fully Automated y Human-in-the-Loop](ADR-010-human-in-the-loop-tests.md)
 - [ADR-011: Maestro como runner de pruebas de apps Android e iOS](ADR-011-maestro-mobile-app-runner.md)
+- [ADR-012: Playwright para pruebas web desktop y web mobile](ADR-012-playwright-web-desktop-and-mobile.md)
 
 ## Formato de ADR
 
