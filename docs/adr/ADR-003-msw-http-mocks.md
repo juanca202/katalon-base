@@ -1,7 +1,7 @@
 ---
 id: ADR-003
-status: Accepted
-last_update: 2026-10-02
+status: Deprecated
+last_update: 2026-10-26
 deciders: [Equipo de QA]
 tags: [msw, testing, http, mocks]
 supersedes: null
@@ -40,5 +40,6 @@ Se adopta **Mock Service Worker (MSW)** como mecanismo para simular APIs HTTP fu
 ## Referencias
 
 - [Estándar de Testing](../standards/testing.md) — requisito «Mocks de APIs HTTP»
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [Mock Service Worker](https://mswjs.io/)
+- Deprecated el 2026-10-26: deja de estar vigente al adoptar Katalon como runner único ([ADR-013](ADR-013-katalon-test-runner.md)).

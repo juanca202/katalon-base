@@ -1,11 +1,11 @@
 ---
 id: ADR-009
-status: Accepted
-last_update: 2026-10-13
+status: Superseded
+last_update: 2026-10-26
 deciders: [Equipo de QA]
 tags: [testing, reporting, allure, traceability, azure-pipelines]
 supersedes: null
-superseded_by: null
+superseded_by: ADR-015
 emits: [testing/CR-014]
 ---
 
@@ -100,3 +100,4 @@ Esta decisión extiende ADR-007 y ADR-008 sin reemplazarlos.
 - [ADR-008: Trazabilidad entre pruebas automatizadas y Test Cases de Azure DevOps](ADR-008-azure-devops-test-case-traceability.md)
 - [Estándar de Testing](../standards/testing.md) — requisitos «Reportería con Allure» y «Jerarquía Historia, Criterio y Caso de prueba»
 - [Allure Report](https://allurereport.org/docs/)
+- Superseded por [ADR-015: Reportería con Allure a partir de los resultados de Katalon](ADR-015-katalon-allure-reporting.md) el 2026-10-26.

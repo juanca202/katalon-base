@@ -1,12 +1,13 @@
 # test-katalon
 
-Pruebas automatizadas de [Tripot](https://factor.ec/tripot), un sistema web de administración de finanzas personales. El código de Tripot no vive en este repositorio: las pruebas se ejecutan contra la aplicación desplegada, cuya URL se toma de `BASE_URL` (y `API_BASE_URL` para la API) en el archivo `.env`.
+Pruebas automatizadas de [Tripot](https://factor.ec/tripot), un sistema web de administración de finanzas personales. El código de Tripot no vive en este repositorio: las pruebas se ejecutan contra la aplicación desplegada.
 
-El proyecto parte del proyecto base de QA ([test-base](https://github.com/juanca202/test-base)) y usa Playwright + TypeScript con Page Object Model, configuración por ambiente y reportería con Allure, con trazabilidad de cada prueba hacia sus Test Cases de Azure DevOps.
+Katalon Studio, en su edición gratuita, es el runner único de pruebas para web, API y apps móviles ([ADR-013](docs/adr/ADR-013-katalon-test-runner.md)). Las pruebas se ejecutan en local desde Katalon Studio, y sus resultados se publican en Allure y en los Test Cases de Azure DevOps. El proyecto parte del proyecto base de QA ([test-base](https://github.com/juanca202/test-base)), construido sobre Playwright y Maestro: las secciones siguientes describen ese montaje, que sigue vigente mientras se migran las pruebas a Katalon.
 
 ## Características principales
 
-- 🎭 **Playwright + TypeScript**: Framework moderno para testing E2E y API
+- 🎭 **Playwright + TypeScript**: Runner para testing E2E web y API
+- 📱 **Maestro**: Runner para apps nativas o híbridas Android e iOS
 - 📊 **Allure Reports**: Reportería avanzada con categorización de fallos, historial y tendencias
 - 🌐 **Multi-browser**: Soporte para Chromium, Firefox, Safari y móviles
 - 🔧 **Configuración flexible**: Variables por ambiente y configuración modular

@@ -1,11 +1,11 @@
 ---
 id: ADR-010
-status: Accepted
-last_update: 2026-10-05
+status: Superseded
+last_update: 2026-10-26
 deciders: [Equipo de QA]
 tags: [testing, human-in-the-loop, playwright, otp]
 supersedes: null
-superseded_by: null
+superseded_by: ADR-016
 emits: [testing/CR-015, testing/CR-016, testing/CR-017, testing/CR-018]
 ---
 
@@ -64,3 +64,4 @@ La intervención humana se implementa con un helper común, `askHuman()` (`src/h
 - [Testing Standards](../standards/testing.md): requisito `test-types`
 - [ADR-007: Evidencias y artefactos de ejecución](ADR-007-execution-evidence.md)
 - [ADR-008: Trazabilidad entre pruebas automatizadas y Test Cases de Azure DevOps](ADR-008-azure-devops-test-case-traceability.md)
+- Superseded por [ADR-016: Pruebas Human-in-the-Loop con Katalon](ADR-016-katalon-human-in-the-loop.md) el 2026-10-26.

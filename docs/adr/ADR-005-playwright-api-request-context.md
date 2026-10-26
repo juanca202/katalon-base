@@ -1,7 +1,7 @@
 ---
 id: ADR-005
-status: Accepted
-last_update: 2026-09-22
+status: Deprecated
+last_update: 2026-10-26
 deciders: [Equipo de QA]
 tags: [playwright, api, rest, graphql]
 supersedes: null
@@ -38,6 +38,7 @@ Ese contexto es el cliente HTTP de la suite: la fixture `request` y, cuando la p
 
 ## Referencias
 
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [Estándar de Testing](../standards/testing.md) — requisito «Pruebas REST y GraphQL»
 - [APIRequestContext](https://playwright.dev/docs/api/class-apirequestcontext)
+- Deprecated el 2026-10-26: deja de estar vigente al adoptar Katalon como runner único ([ADR-013](ADR-013-katalon-test-runner.md)).

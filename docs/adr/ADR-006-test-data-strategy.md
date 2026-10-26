@@ -1,11 +1,11 @@
 ---
 id: ADR-006
-status: Accepted
-last_update: 2026-10-02
+status: Superseded
+last_update: 2026-10-26
 deciders: [Equipo de QA]
 tags: [testing, test-data, fixtures, secrets]
 supersedes: null
-superseded_by: null
+superseded_by: ADR-018
 emits: [testing/CR-004, testing/CR-005, testing/CR-006]
 ---
 
@@ -42,3 +42,4 @@ Los datos de prueba se tratan según su naturaleza:
 ## Referencias
 
 - [Estándar de Testing](../standards/testing.md) — requisito «Gestión de datos de prueba»
+- Superseded por [ADR-018: Datos de prueba con Katalon](ADR-018-katalon-test-data.md) el 2026-10-26.

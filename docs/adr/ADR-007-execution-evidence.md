@@ -1,11 +1,11 @@
 ---
 id: ADR-007
-status: Accepted
-last_update: 2026-10-02
+status: Superseded
+last_update: 2026-10-26
 deciders: [Equipo de QA]
 tags: [testing, evidence, trace, allure]
 supersedes: null
-superseded_by: null
+superseded_by: ADR-014
 emits: [testing/CR-007, testing/CR-008]
 ---
 
@@ -175,8 +175,9 @@ test('TC-1234: crear usuario devuelve 201', async ({ request }) => {
 
 ## Referencias
 
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [ADR-011: Maestro como runner de pruebas de apps Android e iOS](ADR-011-maestro-mobile-app-runner.md)
 - [ADR-008: Trazabilidad entre pruebas automatizadas y Test Cases de Azure DevOps](ADR-008-azure-devops-test-case-traceability.md)
 - [Estándar de Testing](../standards/testing.md) — requisito «Evidencias de ejecución»
 - [Playwright Trace Viewer](https://playwright.dev/docs/trace-viewer)
+- Superseded por [ADR-014: Evidencias de ejecución con Katalon](ADR-014-katalon-execution-evidence.md) el 2026-10-26.

@@ -1,11 +1,11 @@
 ---
 id: ADR-008
-status: Accepted
-last_update: 2026-10-01
+status: Superseded
+last_update: 2026-10-26
 deciders: [Equipo de QA]
 tags: [testing, azure-devops, traceability, test-case, pipeline]
 supersedes: null
-superseded_by: null
+superseded_by: ADR-017
 emits:
   [
     testing/CR-009,
@@ -64,6 +64,7 @@ Las reglas continuas que esta decisión pone en vigor viven en el requisito «Tr
 
 ## Referencias
 
-- [ADR-001: Playwright como Framework Principal de Testing](ADR-001-playwright-as-testing-framework.md)
+- [ADR-001: Runners de pruebas: Playwright y Maestro](ADR-001-test-runners.md)
 - [ADR-007: Evidencias y artefactos de ejecución](ADR-007-execution-evidence.md)
 - [Estándar de Testing](../standards/testing.md) — requisito «Trazabilidad con Test Cases de Azure DevOps»
+- Superseded por [ADR-017: Trazabilidad con Test Cases de Azure DevOps desde los resultados de Katalon](ADR-017-katalon-azure-devops-traceability.md) el 2026-10-26.

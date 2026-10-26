@@ -9,6 +9,20 @@
       "type": "stdio",
       "command": "maestro",
       "args": ["mcp", "--no-viewer", "--working-dir=tests/maestro"]
+    },
+    "ado-bay-jua": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@azure-devops/mcp",
+        "BayteqDev",
+        "--authentication",
+        "pat"
+      ],
+      "env": {
+        "PERSONAL_ACCESS_TOKEN": "${ADO_BAY_JUA_PAT}"
+      }
     }
   }
 }
