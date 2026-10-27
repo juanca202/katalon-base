@@ -156,7 +156,7 @@ Los casos de prueba que no representan un Test Case de Azure DevOps no declaran 
 
 > Decisión de origen: [ADR-004](../adr/ADR-004-katalon-allure-reporting.md).
 
-Tras cada ejecución de una Test Suite, **DEBE** generarse un reporte de Allure a partir del `JUnit_Report.xml` que Katalon escribe en `Reports/`, convertido a `allure-results/` con las evidencias adjuntas por [scripts/katalon/junit-to-allure.mjs](../../scripts/katalon/junit-to-allure.mjs) (`npm run allure:katalon`). El reporte **DEBE** conservar el historial de ejecuciones, configurado en `allurerc.mjs`, para habilitar tendencias y detección de pruebas inestables, y **DEBE** adjuntarse al test run de Azure DevOps.
+Tras cada ejecución de una Test Suite, **DEBE** generarse un reporte de Allure a partir del `JUnit_Report.xml` que Katalon escribe en `Reports/`, convertido a `allure-results/` con las evidencias adjuntas por [scripts/katalon/junit-to-allure.mjs](../../scripts/katalon/junit-to-allure.mjs) (`npm run allure:katalon`). Los videos AVI o MOV del Screen Recorder se adjuntan convertidos a MP4 (H.264) cuando ffmpeg está disponible, para que se reproduzcan en el navegador. El reporte **DEBE** conservar el historial de ejecuciones, configurado en `allurerc.mjs`, para habilitar tendencias y detección de pruebas inestables, y **DEBE** adjuntarse al test run de Azure DevOps.
 
 ### Excepciones
 

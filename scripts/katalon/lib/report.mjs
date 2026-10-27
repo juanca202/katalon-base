@@ -2,7 +2,7 @@
 // tests/katalon/Reports/<fecha>/<suite>/<fecha>/JUnit_Report.xml, más el log,
 // las capturas y los videos de esa carpeta. La usan la conversión a Allure
 // (ADR-004) y la publicación en Azure DevOps (ADR-006).
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
 
 export const REPORTS_DIR = 'tests/katalon/Reports';
@@ -118,21 +118,54 @@ export function parseJUnit(xml) {
   return cases;
 }
 
+// Adjuntos que el log de la ejecución registra en cada caso: las capturas se
+// nombran con un timestamp (p. ej. 1793065248196.png), así que su caso solo
+// se conoce por el bloque "Start Test Case" del log en el que aparecen.
+function attachmentsByCase(logs) {
+  const byCase = new Map();
+  let current = null;
+  for (const log of logs) {
+    for (const [, start, attachment] of readFileSync(log, 'utf8').matchAll(
+      /<message>Start Test Case : ([^<]+)<\/message>|<property name="attachment">([^<]+)<\/property>/g
+    )) {
+      if (start) {
+        current = decode(start).trim();
+        if (!byCase.has(current)) byCase.set(current, new Set());
+      } else if (current) {
+        byCase.get(current).add(decode(attachment).trim());
+      }
+    }
+  }
+  return byCase;
+}
+
 // Archivos de evidencia de la carpeta del reporte.
 export function reportEvidence(reportDir) {
   const files = walk(reportDir);
+  const logs = files
+    .filter(file => /^execution\d*\.log$/.test(basename(file)))
+    .sort(
+      (a, b) =>
+        Number(basename(a).match(/\d+/)?.[0] ?? 0) -
+        Number(basename(b).match(/\d+/)?.[0] ?? 0)
+    );
   return {
-    logs: files.filter(file => /^execution\d*\.log$/.test(basename(file))),
+    logs,
     media: files.filter(file => MEDIA.has(extname(file).toLowerCase())),
+    attachments: attachmentsByCase(logs),
   };
 }
 
-// Capturas y videos de un caso: los que llevan su TC-<id> o su nombre en la ruta.
-export function mediaForCase(media, reportDir, tc) {
+// Capturas y videos de un caso: los que llevan su TC-<id> o su nombre en la
+// ruta, y los que el log registra como adjuntos del caso.
+export function mediaForCase(media, reportDir, tc, attachments = new Map()) {
+  const logged = attachments.get(tc.name) ?? new Set();
   return media.filter(file => {
     const rel = file.slice(reportDir.length);
     return (
-      (tc.tcId && rel.includes(`TC-${tc.tcId}`)) || rel.includes(tc.shortName)
+      (tc.tcId && rel.includes(`TC-${tc.tcId}`)) ||
+      rel.includes(tc.shortName) ||
+      logged.has(basename(file))
     );
   });
 }

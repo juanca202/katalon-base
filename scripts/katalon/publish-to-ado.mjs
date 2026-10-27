@@ -9,7 +9,8 @@
 //   - Organización y proyecto: projectManagement de .sdd-devkit/settings.json.
 //   - ADO_PAT: Personal Access Token con permiso Test Management (Read & write).
 //   - ADO_TEST_PLAN_ID: ID del Test Plan (o --plan <id>).
-//   Las variables se leen del entorno o, si existe, del archivo .env (no versionado).
+//   Las variables se leen del entorno o del archivo .env (no versionado), que
+//   prevalece y admite referencias a otras variables: ADO_PAT=${ADO_PAT_ORG}.
 //
 // Uso: node scripts/katalon/publish-to-ado.mjs [JUnit_Report.xml] [--plan <id>] [--dry-run]
 //   Sin ruta toma el JUnit_Report.xml más reciente de tests/katalon/Reports.
@@ -35,11 +36,18 @@ const OUTCOME = {
   skipped: 'NotExecuted',
 };
 
+// El .env es configuración del proyecto: sus valores no vacíos prevalecen
+// sobre las variables globales del shell (p. ej. un ADO_PAT de otra
+// organización). Admite referencias a otras variables: ADO_PAT=${ADO_PAT_ORG}.
 function loadDotEnv(path = '.env') {
   if (!existsSync(path)) return;
   for (const line of readFileSync(path, 'utf8').split('\n')) {
     const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
-    if (match && !process.env[match[1]]) process.env[match[1]] = match[2];
+    if (!match) continue;
+    const value = match[2]
+      .replace(/^(['"])(.*)\1$/, '$2')
+      .replace(/\$\{(\w+)\}|\$(\w+)/g, (_, a, b) => process.env[a ?? b] ?? '');
+    if (value) process.env[match[1]] = value;
   }
 }
 
@@ -79,7 +87,7 @@ if (!junitPath || !existsSync(junitPath)) {
 }
 const reportDir = dirname(junitPath);
 const cases = parseJUnit(readFileSync(junitPath, 'utf8'));
-const { logs, media } = reportEvidence(reportDir);
+const { logs, media, attachments } = reportEvidence(reportDir);
 const traced = cases.filter(tc => tc.tcId);
 const untraced = cases.filter(tc => !tc.tcId);
 const runName = `${cases[0]?.suite || 'Katalon'} - ${basename(reportDir)}`;
@@ -96,7 +104,7 @@ if (args.dryRun) {
     `\n[dry-run] Test run «${runName}» en ${baseUrl}, plan ${planId || '(sin definir)'}`
   );
   for (const tc of traced) {
-    const files = mediaForCase(media, reportDir, tc).map(file =>
+    const files = mediaForCase(media, reportDir, tc, attachments).map(file =>
       basename(file)
     );
     console.log(
@@ -113,7 +121,16 @@ if (!planId)
   fail('Falta el Test Plan: define ADO_TEST_PLAN_ID o usa --plan <id>.');
 if (!process.env.ADO_PAT)
   fail('Falta ADO_PAT (Personal Access Token de Azure DevOps).');
-const auth = `Basic ${Buffer.from(`:${process.env.ADO_PAT}`).toString('base64')}`;
+// ADO_PAT admite el PAT tal cual o ya codificado como base64(":<PAT>"), que es
+// el formato que espera el MCP de Azure DevOps.
+function basicAuth(pat) {
+  const decoded = Buffer.from(pat, 'base64').toString('utf8');
+  const preEncoded =
+    /^[^:\s]*:[A-Za-z0-9]+$/.test(decoded) &&
+    Buffer.from(decoded).toString('base64') === pat;
+  return `Basic ${preEncoded ? pat : Buffer.from(`:${pat}`).toString('base64')}`;
+}
+const auth = basicAuth(process.env.ADO_PAT);
 
 async function ado(method, path, body) {
   const response = await fetch(`${baseUrl}${path}`, {
@@ -126,7 +143,15 @@ async function ado(method, path, body) {
       `${method} ${path} → ${response.status} ${await response.text()}`
     );
   }
-  return response.status === 204 ? null : response.json();
+  if (response.status === 204) return null;
+  // Con un PAT inválido o sin permisos, Azure DevOps responde 203 con la
+  // página de inicio de sesión en lugar de JSON.
+  if (!response.headers.get('content-type')?.includes('application/json')) {
+    fail(
+      `Azure DevOps rechazó ADO_PAT (${method} ${path} → ${response.status}): revisa que el token sea de la organización ${pm.workspace}, no haya expirado y tenga el permiso Test Management (Read & write).`
+    );
+  }
+  return response.json();
 }
 
 async function attach(path, file, comment) {
@@ -195,7 +220,7 @@ await ado(
 
 for (const result of results) {
   const tc = caseById.get(Number(result.testCase.id));
-  for (const file of mediaForCase(media, reportDir, tc)) {
+  for (const file of mediaForCase(media, reportDir, tc, attachments)) {
     await attach(
       `/test/Runs/${run.id}/Results/${result.id}/attachments`,
       file,

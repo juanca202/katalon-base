@@ -12,6 +12,7 @@
 //
 // Uso: node scripts/katalon/junit-to-allure.mjs [JUnit_Report.xml] [allure-results] [plataforma]
 //   Sin argumentos toma el JUnit_Report.xml más reciente de tests/katalon/Reports.
+import { spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import {
   copyFileSync,
@@ -90,7 +91,7 @@ function specFor(tcId) {
 // Evidencias del reporte: el log de la ejecución va a todos los casos; las
 // capturas y videos, al caso cuyo TC-<id> o nombre aparece en su ruta.
 mkdirSync(outDir, { recursive: true });
-const { logs, media } = reportEvidence(reportDir);
+const { logs, media, attachments } = reportEvidence(reportDir);
 const sharedLogs = logs.map(file => {
   const source = `${randomUUID()}-attachment.log`;
   copyFileSync(file, join(outDir, source));
@@ -98,10 +99,59 @@ const sharedLogs = logs.map(file => {
 });
 const usedMedia = new Set();
 
+// Katalon graba en AVI o MOV, que los navegadores no reproducen dentro del
+// reporte. Si hay ffmpeg, el video se adjunta convertido a MP4 (H.264); si no,
+// se adjunta el original y se avisa una sola vez.
+const BROWSER_UNPLAYABLE = new Set(['.avi', '.mov']);
+let ffmpegMissing = false;
+
+function attachAsMp4(file) {
+  if (ffmpegMissing) return null;
+  const source = `${randomUUID()}-attachment.mp4`;
+  const run = spawnSync(
+    'ffmpeg',
+    [
+      '-loglevel',
+      'error',
+      '-y',
+      '-i',
+      file,
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      '-vf',
+      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      '-movflags',
+      '+faststart',
+      '-an',
+      join(outDir, source),
+    ],
+    { encoding: 'utf8' }
+  );
+  if (run.error?.code === 'ENOENT') {
+    ffmpegMissing = true;
+    console.warn(
+      'ffmpeg no está instalado: los videos se adjuntan en su formato original (no se reproducen en el navegador).'
+    );
+    return null;
+  }
+  if (run.status !== 0) {
+    console.warn(
+      `No se pudo convertir a MP4 ${file}; se adjunta el original.\n${run.stderr}`
+    );
+    return null;
+  }
+  const name = `${basename(file, extname(file))}.mp4`;
+  return { name, source, type: MIME['.mp4'] };
+}
+
 function attachMedia(tc) {
-  return mediaForCase(media, reportDir, tc).map(file => {
+  return mediaForCase(media, reportDir, tc, attachments).map(file => {
     usedMedia.add(file);
     const ext = extname(file).toLowerCase();
+    const mp4 = BROWSER_UNPLAYABLE.has(ext) ? attachAsMp4(file) : null;
+    if (mp4) return mp4;
     const source = `${randomUUID()}-attachment${ext}`;
     copyFileSync(file, join(outDir, source));
     return { name: basename(file), source, type: MIME[ext] };

@@ -18,6 +18,7 @@ Katalon Studio, en su edición gratuita, es el runner único de pruebas para web
 - [Katalon Studio](https://katalon.com/download) (edición gratuita)
 - Node.js 20 o superior y npm (scripts auxiliares y reporte de Allure)
 - Gradle y Java 17 o superior (análisis con CodeNarc)
+- [ffmpeg](https://ffmpeg.org/) (opcional, `brew install ffmpeg`): convierte a MP4 los videos AVI de Katalon para que se reproduzcan en el reporte de Allure; sin ffmpeg se adjunta el AVI original
 - Para apps móviles: Android SDK con `ANDROID_HOME` (emulador) o un dispositivo conectado
 
 ## Estructura del proyecto
@@ -112,7 +113,7 @@ El detalle completo está en los [estándares](docs/standards/README.md).
 ## Reportes de ejecución
 
 - **Katalon** escribe en `tests/katalon/Reports/<fecha>/<suite>/<fecha>/` el `JUnit_Report.xml`, el `execution0.log`, las capturas y los videos.
-- **Allure** (`allurerc.mjs`): `npm run allure:katalon` convierte ese reporte con [scripts/katalon/junit-to-allure.mjs](scripts/katalon/junit-to-allure.mjs), adjunta las evidencias y genera el reporte. Guarda el historial en `.allure/history.jsonl`. `allure-results/` es la fuente de la skill `generate-report`.
+- **Allure** (`allurerc.mjs`): `npm run allure:katalon` convierte ese reporte con [scripts/katalon/junit-to-allure.mjs](scripts/katalon/junit-to-allure.mjs), adjunta las evidencias (los videos AVI o MOV, convertidos a MP4 si hay ffmpeg) y genera el reporte. Guarda el historial en `.allure/history.jsonl`. `allure-results/` es la fuente de la skill `generate-report`.
 
 ## Calidad y flujo de trabajo
 
