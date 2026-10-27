@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "katalon-studio": {
+      "type": "http",
+      "url": "http://localhost:33699/mcp/stream"
+    },
     "ado-bay-jua": {
       "type": "stdio",
       "command": "npx",
