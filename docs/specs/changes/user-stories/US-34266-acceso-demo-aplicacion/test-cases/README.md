@@ -2,7 +2,7 @@
 
 Artefacto padre: [US-34266](../README.md) · Test Plan ADO: **Bayteq IA** (#34282) · Test Suite ADO: **US-34266: Acceso demo de la aplicación** (#34284).
 
-Entorno de referencia: **Producción** (sistema bajo prueba Tripot, `tripot-web`). Datos de prueba en [`tests/data/`](../../../../../../tests/data/). Verificación de **flujos** (no UI).
+Entorno de referencia: **Producción** (sistema bajo prueba Tripot, `tripot-web`). Datos de prueba en [`tests/data/`](../../../../../../tests/data/). Verificación de **flujos** (no UI). Plataformas: todos los casos aplican a **Web**, **Web móvil** y **App**.
 
 | TC                                                                 | Perspectiva | Tipo de prueba | Estado | Prioridad | Criterio de aceptación |
 | ------------------------------------------------------------------ | ----------- | -------------- | ------ | --------- | ---------------------- |

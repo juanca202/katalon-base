@@ -5,6 +5,7 @@
 **Estado:** Ready
 **Tipo de prueba:** E2E
 **Tipo de ejecución:** 🤖 Fully Automated
+**Plataformas:** Web, Web móvil, App
 **Fecha:** 2026-10-26
 **Perspectiva:** Error
 **Prioridad:** Alta
