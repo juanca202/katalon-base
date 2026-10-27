@@ -18,10 +18,9 @@ Este directorio contiene los estándares y convenciones técnicas que deben segu
 
 ### Código
 
-- Convenciones de TypeScript
-- Estructura de Page Object Model
-- Patrones de helpers y utilities
-- Manejo de errores y excepciones
+- Análisis estático de Groovy con CodeNarc
+- Custom Keywords y Test Objects del Object Repository
+- Manejo de errores y secretos
 
 ### Integración
 

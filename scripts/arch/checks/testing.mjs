@@ -11,6 +11,7 @@ const STANDARD = 'testing';
 
 let blockingFailures = 0;
 
+// eslint-disable-next-line no-unused-vars -- sin chequeos activos hasta tener CR automatizados de Katalon
 function check(cr, enfoque, descripcion, fn) {
   try {
     fn();
@@ -32,8 +33,7 @@ function check(cr, enfoque, descripcion, fn) {
   }
 }
 
-// Sin chequeos activos: los de Playwright y Maestro se retiraron al adoptar
-// Katalon (ADR-013). Los CR de Katalon (CR-009, CR-010, CR-024, CR-025) siguen
-// en Pending hasta que exista el proyecto en tests/katalon/.
+// Sin chequeos activos: los CR de Katalon (CR-005, CR-006, CR-010, CR-011)
+// siguen en Pending.
 
 process.exit(blockingFailures > 0 ? 1 : 0);

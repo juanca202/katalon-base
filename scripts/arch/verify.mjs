@@ -47,23 +47,27 @@ if (!existsSync(checksDir)) {
   process.exit(0);
 }
 
-const isCheck = (f) => /\.(mjs|js)$/.test(f) && !f.includes('.template');
+const isCheck = f => /\.(mjs|js)$/.test(f) && !f.includes('.template');
 const files = readdirSync(checksDir).filter(isCheck).sort();
-const bySlug = new Map(files.map((f) => [f.replace(/\.(mjs|js)$/, ''), f]));
+const bySlug = new Map(files.map(f => [f.replace(/\.(mjs|js)$/, ''), f]));
 
 let selected = files;
 if (requested.length > 0) {
-  const missing = requested.filter((slug) => !bySlug.has(slug));
+  const missing = requested.filter(slug => !bySlug.has(slug));
   if (missing.length > 0) {
     console.error(`Estándar(es) sin check registrado: ${missing.join(', ')}`);
-    console.error(`Disponibles: ${[...bySlug.keys()].join(', ') || '(ninguno)'}`);
+    console.error(
+      `Disponibles: ${[...bySlug.keys()].join(', ') || '(ninguno)'}`
+    );
     process.exit(2);
   }
-  selected = requested.map((slug) => bySlug.get(slug));
+  selected = requested.map(slug => bySlug.get(slug));
 }
 
 if (selected.length === 0) {
-  console.log(`No hay fitness functions de arquitectura registradas en ${checksDir}.`);
+  console.log(
+    `No hay fitness functions de arquitectura registradas en ${checksDir}.`
+  );
   process.exit(0);
 }
 
@@ -73,7 +77,9 @@ if (selected.length === 0) {
 // (NO_COLOR / FORCE_COLOR), se les fuerza color vía FORCE_COLOR=1 —
 // util.styleText la respeta aunque el stream no sea TTY.
 const childEnv =
-  process.stdout.isTTY && !('NO_COLOR' in process.env) && !('FORCE_COLOR' in process.env)
+  process.stdout.isTTY &&
+  !('NO_COLOR' in process.env) &&
+  !('FORCE_COLOR' in process.env)
     ? { ...process.env, FORCE_COLOR: '1' }
     : process.env;
 
@@ -85,7 +91,10 @@ const failedStandards = [];
 for (const file of selected) {
   const slug = file.replace(/\.(mjs|js)$/, '');
   console.log(`\n=== ${slug} (checks/${file}) ===`);
-  const res = spawnSync(process.execPath, [join(checksDir, file)], { encoding: 'utf8', env: childEnv });
+  const res = spawnSync(process.execPath, [join(checksDir, file)], {
+    encoding: 'utf8',
+    env: childEnv,
+  });
   if (res.stdout) process.stdout.write(res.stdout);
   if (res.stderr) process.stderr.write(res.stderr);
   for (const rawLine of (res.stdout ?? '').split('\n')) {
@@ -98,9 +107,13 @@ for (const file of selected) {
 }
 
 console.log('\n----- Resumen de validaciones de arquitectura -----');
-console.log(`Estándares: ${selected.length}   Criterios — PASS: ${pass}   WARN: ${warn}   FAIL: ${fail}`);
+console.log(
+  `Estándares: ${selected.length}   Criterios — PASS: ${pass}   WARN: ${warn}   FAIL: ${fail}`
+);
 if (failedStandards.length > 0) {
-  console.log(`Estándares con criterios bloqueantes violados: ${failedStandards.join(', ')}`);
+  console.log(
+    `Estándares con criterios bloqueantes violados: ${failedStandards.join(', ')}`
+  );
   process.exit(1);
 }
 console.log('Todos los criterios bloqueantes se cumplen.');

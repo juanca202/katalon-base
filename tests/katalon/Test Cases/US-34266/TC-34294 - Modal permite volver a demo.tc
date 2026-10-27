@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>US-34266 / AC-009 (Usabilidad). Happy Path. El modal de autenticacion derivado del modo demo permite volver a la demo sin registrarse ni iniciar sesion. Continua TC-34289. El mecanismo exacto de cierre del modal se confirma en la primera ejecucion.</description>
+   <name>TC-34294 - Modal permite volver a demo</name>
+   <tag>GenAI,US-34266,E2E,TC-34294,HappyPath,AC-009,FullyAutomated</tag>
+   <integratedEntity>
+      <productName>TESTOPS</productName>
+      <properties>
+         <entry>
+            <key>createdByName</key>
+            <value>Juan Carlos Altamirano</value>
+         </entry>
+         <entry>
+            <key>lastModifiedByName</key>
+            <value>Juan Carlos Altamirano</value>
+         </entry>
+         <entry>
+            <key>createdByUuid</key>
+            <value>a821dfeb-e288-407d-8f4d-86b8fb215f70</value>
+         </entry>
+         <entry>
+            <key>lastModifiedByUuid</key>
+            <value>a821dfeb-e288-407d-8f4d-86b8fb215f70</value>
+         </entry>
+      </properties>
+      <type>TESTCASE</type>
+   </integratedEntity>
+   <comment></comment>
+   <origin>STUDIOASSIST</origin>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>52078dfc-c1b6-49f2-bff6-ae16d8f27104</testCaseGuid>
+</TestCaseEntity>

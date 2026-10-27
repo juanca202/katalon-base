@@ -7,15 +7,11 @@ yarn-error.log*
 # Build outputs
 dist/
 build/
-*.d.ts
-*.d.ts.map
-*.js.map
 
 # Test results and artifacts
 test-results/
 allure-results/
 allure-report/
-playwright-report/
 
 # Screenshots and videos
 screenshots/
@@ -28,9 +24,6 @@ traces/
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Authentication
-tests/playwright/setup/auth.json
 
 # Logs
 *.log

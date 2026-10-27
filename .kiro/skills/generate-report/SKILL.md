@@ -114,7 +114,7 @@ Es el único reporte que mezcla contenido de specs con datos que el repo no tien
 | 2.1.10 Normativa                                | SRS §11 Cumplimiento normativo                                                                                                                                                                                                                                               |
 | 2.2.1 Historias de usuario de calidad           | Tabla US: ID, descripción, AC-XXX y tipo de prueba (E2E / API / Visual) tomado del índice de `test-cases/`                                                                                                                                                                   |
 | 2.2.2–2.2.3 Casos de uso / prediseñados         | Índice de `test-cases/README.md` de cada US                                                                                                                                                                                                                                  |
-| 2.2.5–2.2.6 Prerrequisitos y datos              | Precondiciones y `Datos de prueba` de los TC (marcados `[propuesto]`), `.env.example`, ambiente de referencia del TC; `docs/adr/ADR-006` para la estrategia de datos                                                                                                         |
+| 2.2.5–2.2.6 Prerrequisitos y datos              | Precondiciones y `Datos de prueba` de los TC (marcados `[propuesto]`), `.env.example`, ambiente de referencia del TC; `docs/adr/ADR-007` para la estrategia de datos                                                                                                         |
 | 2.3 Riesgos                                     | SRS §14 Riesgos (copiar con su probabilidad/impacto/mitigación)                                                                                                                                                                                                              |
 | 2.4 Documentación                               | Lista fija: DTG018, DTG020, DTG022, DTG045 (y DTG063)                                                                                                                                                                                                                        |
 | 2.5 Equipo de trabajo                           | SRS §5 Equipo (si existe)                                                                                                                                                                                                                                                    |
@@ -352,20 +352,20 @@ Documenta, por historia de usuario, la evidencia de ejecución de sus casos. La 
 ### 1. Entrada y alcance
 
 - Obligatorio: códigos `US-XXX` (Regla global). Los TCs de cada US se listan desde `docs/specs/changes/user-stories/US-XXX-*/test-cases/README.md`.
-- Verificar que `allure-results/` exista y tenga archivos `*-result.json`. Si no, avisar que hay que ejecutar las pruebas (`npm test`, `npm run test:all` o el script de la plataforma) y detenerse; no fabricar evidencia.
+- Verificar que `allure-results/` exista y tenga archivos `*-result.json`. Si no, avisar que hay que ejecutar la Test Suite en Katalon Studio y luego `npm run allure:katalon`, y detenerse; no fabricar evidencia.
 - Informar la fecha/hora de la corrida (`start` del primer resultado y `stop` del último, en milisegundos epoch) y avisar si es anterior a los últimos cambios de las pruebas.
-- Cada script `test*` limpia `allure-results/` al iniciar, así que contiene solo la última ejecución; si el usuario necesita varias plataformas debe haber corrido `npm run test:all`.
+- `npm run allure:katalon` limpia `allure-results/` al iniciar, así que contiene solo la última ejecución convertida.
 
 ### 2. Extraer la evidencia de `allure-results/`
 
 Cada prueba es un `{uuid}-result.json`. Leerlos con un script temporal (en el scratchpad, no en el repo):
 
-1. Campos de cada resultado: `name` (empieza por `TC-XXX:`), `status` (`passed`, `failed`, `broken`, `skipped`), `start` y `stop`, `statusDetails.message` y `statusDetails.trace` ante un fallo, `historyId`, `labels` y `steps`.
-2. Etiquetas (`labels[]`): `parentSuite` = tipo (`E2E` o `API`), `platform` = plataforma (solo E2E: `Web desktop`, `Web mobile`, `Mobile`), `feature` = historia (`US-XXX: título`), `story` = criterio (`AC-XXX: título`). El proyecto de Playwright está en `parameters` (`Project`), y la plataforma de Maestro en `parameters` (`Platform`: Android o iOS).
-3. Los adjuntos viven en la misma carpeta, referenciados por `source` (`{uuid}-attachment.{ext}`) en `attachments[]` y, sobre todo, dentro de `steps[].attachments[]` en cualquier nivel de anidación: recorrer los pasos recursivamente. Tipos: `screenshot` (png), `video` (webm), `trace` (zip, `application/vnd.allure.playwright-trace`), `api-evidence.json` (request, response y assertions de las pruebas API, ADR-007), y los de Maestro (`takeScreenshot/*.png`, `startRecording/*`, `commands.json` y `logs/maestro.log`), que `scripts/maestro/junit-to-allure.mjs` copia a `allure-results/`.
-4. Asociar cada prueba a su US y TC por la etiqueta `feature` (id `US-XXX`) y el prefijo `TC-XXX:` del nombre. Descartar pruebas de US no solicitadas.
+1. Campos de cada resultado: `name` (empieza por `TC-XXX - `), `status` (`passed`, `failed`, `broken`, `skipped`), `start` y `stop`, `statusDetails.message` y `statusDetails.trace` ante un fallo, `historyId`, `labels` y `steps`.
+2. Etiquetas (`labels[]`): `parentSuite` = tipo (`E2E` o `API`), `platform` = plataforma (solo E2E: `Web desktop`, `Web mobile`, `Mobile`), `feature` = historia (`US-XXX: título`), `story` = criterio (`AC-XXX: título`), y `suite` = Test Suite de Katalon ejecutada.
+3. Los adjuntos viven en la misma carpeta, referenciados por `source` (`{uuid}-attachment.{ext}`) en `attachments[]` y, sobre todo, dentro de `steps[].attachments[]` en cualquier nivel de anidación: recorrer los pasos recursivamente. Tipos: capturas (png/jpg), videos (avi/mov/mp4) y el log de la ejecución (`execution0.log`), que `scripts/katalon/junit-to-allure.mjs` copia a `allure-results/` desde el reporte de Katalon (ADR-003).
+4. Asociar cada prueba a su US y TC por la etiqueta `feature` (id `US-XXX`) y el prefijo `TC-XXX - ` del nombre. Descartar pruebas de US no solicitadas.
 
-Una misma prueba puede aparecer varias veces (reintentos o proyectos distintos): agrupar por `historyId`, usar el resultado con `stop` más reciente y anotar los reintentos. Un mismo TC ejecutado en `Web desktop` y `Web mobile` son dos filas, una por plataforma.
+Una misma prueba puede aparecer varias veces: agrupar por `historyId`, usar el resultado con `stop` más reciente y anotar las repeticiones. Un mismo TC ejecutado en plataformas distintas son dos filas, una por plataforma.
 
 ### 3. Copiar la evidencia al entregable
 

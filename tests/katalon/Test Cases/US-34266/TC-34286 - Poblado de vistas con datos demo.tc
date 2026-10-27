@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>US-34266 / AC-002 (Procesamiento de datos). Happy Path. Las vistas del modo demo se pueblan con los datos ficticios (spaces, transactions, budgets, contacts/friends, scheduled, etc.). Nota: la app usa 'Friends' para contactos y agrupa varias entidades en el dashboard.</description>
+   <name>TC-34286 - Poblado de vistas con datos demo</name>
+   <tag>GenAI,TC-34286,AC-002,US-34266,E2E,HappyPath,FullyAutomated</tag>
+   <integratedEntity>
+      <productName>TESTOPS</productName>
+      <properties>
+         <entry>
+            <key>createdByName</key>
+            <value>Juan Carlos Altamirano</value>
+         </entry>
+         <entry>
+            <key>lastModifiedByName</key>
+            <value>Juan Carlos Altamirano</value>
+         </entry>
+         <entry>
+            <key>createdByUuid</key>
+            <value>a821dfeb-e288-407d-8f4d-86b8fb215f70</value>
+         </entry>
+         <entry>
+            <key>lastModifiedByUuid</key>
+            <value>a821dfeb-e288-407d-8f4d-86b8fb215f70</value>
+         </entry>
+      </properties>
+      <type>TESTCASE</type>
+   </integratedEntity>
+   <comment></comment>
+   <origin>STUDIOASSIST</origin>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>ba2b26e8-716b-481e-9def-55db70f8df62</testCaseGuid>
+</TestCaseEntity>

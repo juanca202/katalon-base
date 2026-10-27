@@ -1,20 +1,31 @@
-plugins {
-  id 'java'
-  id "com.katalon.gradle-plugin" version "0.2.0"
-}
-
 repositories {
   mavenCentral()
 }
 
+configurations {
+  codenarc {
+    attributes {
+      attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
+    }
+  }
+}
+
 dependencies {
-  // sample dependencies
-  // rest-assured
-  // compile 'io.rest-assured:rest-assured:3.2.0'
-  // JsonPath
-  // compile 'io.rest-assured:json-path:3.2.0'
-  // XmlPath
-  // compile 'io.rest-assured:json-path:3.2.0'
-  // JSON Schema Validation
-  // compile 'io.rest-assured:json-schema-validator:3.2.0'
+  codenarc 'org.codenarc:CodeNarc:3.5.0'
+  codenarc 'org.slf4j:slf4j-nop:1.7.36'
+}
+
+// Análisis estático del código Groovy (ADR-008): falla si hay cualquier violación.
+tasks.register('codenarc', JavaExec) {
+  group = 'verification'
+  description = 'Analiza Scripts/, Keywords/ y Test Listeners/ con CodeNarc'
+  classpath = configurations.codenarc
+  mainClass = 'org.codenarc.CodeNarc'
+  args '-basedir=.',
+    '-includes=Scripts/**/*.groovy,Keywords/**/*.groovy,Test Listeners/*.groovy',
+    '-rulesetfiles=file:codenarc.ruleset',
+    '-report=text:stdout',
+    '-maxPriority1Violations=0',
+    '-maxPriority2Violations=0',
+    '-maxPriority3Violations=0'
 }

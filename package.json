@@ -1,75 +1,49 @@
 {
-  "name": "test-base",
+  "name": "test-katalon",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Pruebas automatizadas de Tripot con Katalon Studio",
   "scripts": {
-    "test": "npm run clean:results && allure run -- playwright test",
-    "test:web-desktop": "npm run clean:results && allure run -- playwright test --project=chromium",
-    "test:web-mobile": "npm run clean:results && allure run -- playwright test --project='Mobile Chrome'",
-    "test:mobile": "npm run clean:results && mkdir -p allure-results; node scripts/maestro/run.mjs tests/maestro test-results/maestro; r=$?; node scripts/maestro/junit-to-allure.mjs test-results/maestro/junit.xml test-results/maestro allure-results; allure generate allure-results; exit $r",
-    "test:all": "npm run clean:results && playwright test; p=$?; mkdir -p allure-results; node scripts/maestro/run.mjs tests/maestro test-results/maestro; m=$?; node scripts/maestro/junit-to-allure.mjs test-results/maestro/junit.xml test-results/maestro allure-results; allure generate allure-results; exit $((p || m))",
-    "test:headed": "playwright test --headed",
-    "test:ui": "playwright test --ui",
-    "test:human": "npm run clean:results && allure run -- playwright test -c playwright.human.config.ts",
-    "test:e2e": "npm run clean:results && allure run -- playwright test tests/playwright/e2e",
-    "test:api": "npm run clean:results && allure run -- playwright test tests/playwright/api",
-    "test:debug": "playwright test --debug",
+    "allure:katalon": "npm run clean:results && node scripts/katalon/junit-to-allure.mjs && npm run allure:serve",
     "allure:generate": "rm -rf allure-report && allure generate allure-results",
     "allure:serve": "rm -rf allure-report && allure generate allure-results --open",
     "allure:open": "allure open allure-report",
-    "lint": "eslint src tests --ext .ts,.js",
-    "lint:fix": "eslint src tests --ext .ts,.js --fix",
-    "format": "prettier --write \"src/**/*.{ts,js}\" \"tests/**/*.{ts,js}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,js}\" \"tests/**/*.{ts,js}\"",
-    "build": "tsc",
-    "clean": "rm -rf dist allure-results allure-report test-results",
+    "lint": "eslint scripts",
+    "lint:fix": "eslint scripts --fix",
+    "format": "prettier --write \"scripts/**/*.mjs\"",
+    "format:check": "prettier --check \"scripts/**/*.mjs\"",
+    "clean": "rm -rf allure-results allure-report",
     "clean:results": "rm -rf allure-results allure-report",
-    "install:browsers": "playwright install",
-    "install:deps": "playwright install-deps",
     "emulator:start": "bash scripts/emulator/start.sh",
     "emulator:start:play": "AVD_NAME=qa-pixel-35-play ANDROID_IMAGE=google_apis_playstore bash scripts/emulator/start.sh",
     "emulator:stop": "adb emu kill",
     "prepare": "husky",
-    "quality:check": "npm run lint && npm run format:check && npm run build",
-    "arch": "node scripts/arch/verify.mjs"
+    "quality:check": "npm run lint && npm run format:check",
+    "arch": "node scripts/arch/verify.mjs",
+    "ado:publish": "node scripts/katalon/publish-to-ado.mjs",
+    "codenarc": "gradle -p tests/katalon -q codenarc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.2",
-    "@typescript-eslint/eslint-plugin": "^8.70.1",
-    "@typescript-eslint/parser": "^8.70.1",
     "allure": "^3.20.0",
-    "allure-js-commons": "3.13.0",
-    "allure-playwright": "^3.13.0",
-    "dotenv": "^18.0.3",
     "eslint": "^10.11.0",
-    "eslint-plugin-playwright": "^2.12.0",
     "globals": "^17.12.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1",
-    "msw": "^2.15.0",
-    "prettier": "^3.9.8",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "prettier": "^3.9.8"
   },
   "lint-staged": {
-    "*.{ts,js}": [
+    "scripts/**/*.mjs": [
       "eslint --fix",
       "prettier --write"
     ],
     "*.{json,md}": [
       "prettier --write"
-    ]
-  },
-  "msw": {
-    "workerDirectory": [
-      "public"
     ]
   }
 }

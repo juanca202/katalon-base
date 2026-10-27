@@ -2,177 +2,124 @@
 
 Pruebas automatizadas de [Tripot](https://factor.ec/tripot), un sistema web de administración de finanzas personales. El código de Tripot no vive en este repositorio: las pruebas se ejecutan contra la aplicación desplegada.
 
-Katalon Studio, en su edición gratuita, es el runner único de pruebas para web, API y apps móviles ([ADR-013](docs/adr/ADR-013-katalon-test-runner.md)). Las pruebas se ejecutan en local desde Katalon Studio, y sus resultados se publican en Allure y en los Test Cases de Azure DevOps. El proyecto parte del proyecto base de QA ([test-base](https://github.com/juanca202/test-base)), construido sobre Playwright y Maestro: las secciones siguientes describen ese montaje, que sigue vigente mientras se migran las pruebas a Katalon.
+Katalon Studio, en su edición gratuita, es el runner único de pruebas para web, API y apps móviles ([ADR-002](docs/adr/ADR-002-katalon-test-runner.md)). Las pruebas se ejecutan en local desde Katalon Studio, y sus resultados se publican en Allure y en los Test Cases de Azure DevOps.
 
 ## Características principales
 
-- 🎭 **Playwright + TypeScript**: Runner para testing E2E web y API
-- 📱 **Maestro**: Runner para apps nativas o híbridas Android e iOS
-- 📊 **Allure Reports**: Reportería avanzada con categorización de fallos, historial y tendencias
-- 🌐 **Multi-browser**: Soporte para Chromium, Firefox, Safari y móviles
-- 🔧 **Configuración flexible**: Variables por ambiente y configuración modular
-- 🎯 **Page Object Model**: Estructura mantenible y reutilizable
-- 🧪 **Mocks HTTP con MSW**: Simulación de APIs con Mock Service Worker
-- 🔎 **Evidencias de ejecución**: Trace de Playwright en E2E y evidencia estructurada en API
-- 🔗 **Trazabilidad con Azure DevOps**: Cada prueba se identifica con su Test Case (`TC-<id>`)
+- 🧪 **Katalon Studio**: E2E web, API y apps nativas o híbridas Android e iOS, con Object Repository y Custom Keywords en Groovy
+- 📊 **Allure Reports**: historial, tendencias y árbol Historia → Criterio → Caso de prueba
+- 🔎 **Evidencias de ejecución**: log paso a paso, capturas y video en web ([ADR-003](docs/adr/ADR-003-katalon-execution-evidence.md))
+- 🔗 **Trazabilidad con Azure DevOps**: cada caso se identifica con su Test Case (`TC-<id>`)
 - 🏛️ **Arquitectura documentada y verificable**: ADRs, estándares y validaciones automáticas (`npm run arch`)
-- 📝 **Plantillas de reportes de calidad**: Formatos DTG para informes de pruebas
-- 🚀 **CI/CD Ready**: Pipeline de Azure Pipelines incluido
+- 📝 **Plantillas de reportes de calidad**: formatos DTG para informes de pruebas
 
 ## Requisitos previos
 
-- Node.js 20 o superior
-- npm
+- [Katalon Studio](https://katalon.com/download) (edición gratuita)
+- Node.js 20 o superior y npm (scripts auxiliares y reporte de Allure)
+- Gradle y Java 17 o superior (análisis con CodeNarc)
+- Para apps móviles: Android SDK con `ANDROID_HOME` (emulador) o un dispositivo conectado
 
 ## Estructura del proyecto
 
 ```
-├── src/                    # Código fuente del framework
-│   ├── pages/             # Page Objects (BasePage y páginas derivadas)
-│   ├── fixtures/          # Datos de prueba
-│   └── mocks/             # Handlers y worker de MSW
-├── tests/                 # Test suites, una carpeta por motor de pruebas
-│   └── playwright/        # Pruebas con Playwright
-│       ├── e2e/          # Pruebas End-to-End
-│       ├── api/          # Pruebas de API
-│       ├── setup/        # Global setup y teardown
-│       └── utils/        # Utilidades de testing
-├── public/                # Service worker de MSW (mockServiceWorker.js)
-├── scripts/arch/          # Validaciones de arquitectura (fitness functions)
-├── docs/                  # Documentación técnica
+├── tests/
+│   ├── katalon/            # Proyecto Katalon Studio
+│   │   ├── Test Cases/    # Casos por historia: US-<id>/TC-<id> - título
+│   │   ├── Scripts/       # Scripts Groovy de los casos
+│   │   ├── Object Repository/ # Test Objects
+│   │   ├── Test Suites/   # Suites por historia
+│   │   ├── Keywords/      # Custom Keywords
+│   │   ├── Profiles/      # Execution Profiles por ambiente
+│   │   └── Reports/       # Resultados de ejecución (no versionado)
+│   └── data/               # Datasets de prueba
+├── scripts/
+│   ├── katalon/           # Conversión a Allure y publicación en Azure DevOps
+│   ├── arch/              # Validaciones de arquitectura (fitness functions)
+│   └── emulator/          # Emulador Android para pruebas móviles
+├── docs/
 │   ├── adr/              # Architectural Decision Records
 │   ├── standards/        # Estándares técnicos
 │   ├── templates/        # Plantillas de reportes de calidad (DTG018-DTG063)
 │   ├── formats/          # Formatos originales (xlsx/pdf) de los reportes
 │   └── specs/            # Especificaciones de trabajo (SDD DevKit)
-├── playwright.config.ts   # Configuración de Playwright (proyectos, reporters, evidencias)
 ├── allurerc.mjs           # Configuración de Allure (historial y reporte)
-├── azure-pipelines.yml    # Pipeline de CI en Azure DevOps
-├── .env.example           # Plantilla de variables de ambiente
+├── .env.example           # Variables de entorno (credenciales, PAT de Azure DevOps)
 ├── AGENTS.md              # Reglas del proyecto y stack para agentes de IA
 ├── .agents/               # Memoria persistente del proyecto
-├── .kiro/                 # Steering y skills de Kiro (p. ej. generate-report)
+├── .kiro/                 # Skills de Kiro (p. ej. generate-report)
 ├── .sdd-devkit/           # Configuración de SDD DevKit
 └── .husky/                # Git hooks (pre-commit con lint-staged)
 ```
 
 ## Primeros pasos
 
-1. **Instalar dependencias**:
+1. **Instalar dependencias de los scripts**:
 
    ```bash
    npm install
-   npm run install:browsers
    ```
 
-2. **Configurar variables de ambiente**:
+2. **Configurar las variables de entorno** con las credenciales de prueba ([ADR-007](docs/adr/ADR-007-katalon-test-data.md)):
 
    ```bash
    cp .env.example .env
-   # Editar .env con tus configuraciones
+   # Completar los valores y exportarlos antes de abrir Katalon Studio
    ```
 
-   Variables principales: `BASE_URL`, `API_BASE_URL`, `TEST_ENV`, `START_LOCAL_SERVER`, credenciales de prueba (`TEST_USER_EMAIL`, `TEST_USER_PASSWORD`), `HEADLESS`, `BROWSER`, `TIMEOUT`. Los datos que dependen del ambiente y las credenciales no se versionan (ver [ADR-006](docs/adr/ADR-006-test-data-strategy.md)).
+   Las URLs del sistema bajo prueba están en los Execution Profiles (`tests/katalon/Profiles/`).
 
-3. **Ejecutar pruebas de ejemplo**:
+3. **Abrir el proyecto** `tests/katalon/` en Katalon Studio. En Project > Settings > Execution, activar la grabación de video con **Screen Recorder** para todos los casos y la captura automática al fallar.
+
+4. **Ejecutar una Test Suite** desde Katalon Studio (por ejemplo `Test Suites/US-34266/TS - US-34266 Acceso demo`).
+
+5. **Generar y abrir el reporte de Allure**:
 
    ```bash
-   npm test                    # Todas las pruebas (genera el reporte Allure)
-   npm run test:e2e           # Solo E2E
-   npm run test:api           # Solo API
+   npm run allure:katalon
    ```
 
-4. **Ver reportes**:
+6. **Publicar los resultados en Azure DevOps**:
+
    ```bash
-   npm run allure:serve       # Genera el reporte Allure y lo abre en el navegador
+   npm run ado:publish
    ```
 
 ## Scripts disponibles
 
-### Pruebas
-
-- `npm test` - Ejecutar todas las pruebas y generar el reporte Allure (`allure-report/`)
-- `npm run test:e2e` - Solo pruebas E2E (con reporte Allure)
-- `npm run test:api` - Solo pruebas de API (con reporte Allure)
-- `npm run test:web-desktop` - Web de escritorio (proyecto `chromium`)
-- `npm run test:web-mobile` - Web en viewport móvil (proyecto `Mobile Chrome`)
-- `npm run test:mobile` - Apps nativas o híbridas Android e iOS con Maestro (`tests/maestro/`): resultados JUnit a Allure y evidencias en `test-results/maestro/`. Con varios dispositivos conectados (por ejemplo el emulador y un teléfono), Maestro elige uno por su cuenta; fija el dispositivo con `MAESTRO_DEVICE=emulator-5554 npm run test:mobile` (ver `adb devices`)
-- `npm run test:all` - Playwright (desktop, web-mobile y API) y Maestro en una sola ejecución, con un único reporte Allure
-- `npm run test:human` - Solo pruebas Human-in-the-Loop (`@human`): Chromium y un worker; browser visible solo con `@visible`
-- Los scripts `test*` que generan reporte limpian `allure-results/` al iniciar (`npm run clean:results`), así que cada reporte contiene solo su ejecución; para combinar plataformas en un solo reporte use `test:all`
-- `npm run test:headed` - Ejecutar con browser visible
-- `npm run test:ui` - Interfaz interactiva de Playwright
-- `npm run test:debug` - Modo debug
-
-### Reportes
-
-- `npm run allure:generate` - Generar reporte Allure desde `allure-results/`
-- `npm run allure:serve` - Generar el reporte Allure y abrirlo en el navegador
-- `npm run allure:open` - Abrir un reporte Allure ya generado
-
-### Calidad
-
-- `npm run lint` / `npm run lint:fix` - Ejecutar ESLint (con o sin autocorrección)
-- `npm run format` / `npm run format:check` - Formatear o verificar el formato con Prettier
-- `npm run build` - Compilar TypeScript
-- `npm run quality:check` - Lint, verificación de formato y build
+- `npm run allure:katalon` - Convierte la última ejecución de Katalon (`tests/katalon/Reports/`) y abre el reporte de Allure
+- `npm run ado:publish` - Publica la última ejecución en el Test Plan de Azure DevOps (`ADO_PAT` y `ADO_TEST_PLAN_ID`; `-- --dry-run` para revisar sin publicar)
+- `npm run allure:generate` / `npm run allure:serve` / `npm run allure:open` - Generar, generar y abrir, o abrir el reporte de Allure
+- `npm run lint` / `npm run lint:fix` - ESLint sobre `scripts/`
+- `npm run format` / `npm run format:check` - Prettier sobre `scripts/`
+- `npm run quality:check` - Lint y verificación de formato
+- `npm run codenarc` - Análisis estático del código Groovy del proyecto Katalon con CodeNarc (requiere Gradle y Java)
 - `npm run arch` - Validaciones de arquitectura contra los estándares de `docs/standards/`
-
-### Mantenimiento
-
-- `npm run install:browsers` - Instalar los browsers de Playwright
-- `npm run install:deps` - Instalar las dependencias del sistema de los browsers
-- `npm run emulator:start` - Arrancar el emulador Android `qa-pixel-35` (lo crea si no existe) y esperar a que inicie; requiere Android SDK y `ANDROID_HOME`. Variables: `AVD_NAME`, `ANDROID_API`, `HEADLESS=true` (sin ventana; por defecto solo en CI)
-- `npm run emulator:start:play` - Igual, con una imagen con Google Play Store (AVD `qa-pixel-35-play`) para apps que verifican la licencia de Google Play. La primera vez hay que iniciar sesión con una cuenta de Google en el emulador e instalar la app desde Play Store; el AVD conserva la sesión
-- `npm run emulator:stop` - Apagar el emulador en ejecución
-- `npm run clean` - Eliminar `dist`, `allure-results`, `allure-report` y `test-results`
-
-## Proyectos de Playwright
-
-Definidos en [playwright.config.ts](playwright.config.ts): `chromium` (Chrome de escritorio), `Mobile Chrome` (Pixel 5) y `api-tests` (pruebas de API con `API_BASE_URL`). Para correr uno solo: `npx playwright test --project=chromium`. Firefox, WebKit y Mobile Safari están deshabilitados de momento. Las apps nativas o híbridas de Android e iOS se prueban con Maestro, en su propia carpeta, `tests/maestro/` ([ADR-011](docs/adr/ADR-011-maestro-mobile-app-runner.md)).
+- `npm run emulator:start` / `npm run emulator:start:play` / `npm run emulator:stop` - Emulador Android `qa-pixel-35` (la variante `play` incluye Google Play Store)
+- `npm run clean` - Eliminar `allure-results` y `allure-report`
 
 ## Convenciones de pruebas
 
-- **Page Object Model**: las páginas son clases `*Page.ts` que extienden `BasePage` ([ADR-002](docs/adr/ADR-002-page-object-model-pattern.md)).
-- **Trazabilidad**: el título de cada prueba empieza con el identificador de su Test Case de Azure DevOps, con un solo `TC-<id>` por prueba (por ejemplo `TC-1234: crear usuario devuelve 201`). ESLint lo valida ([ADR-008](docs/adr/ADR-008-azure-devops-test-case-traceability.md)).
-- **Historia → Criterio → Caso de prueba**: las pruebas se agrupan con `acceptanceCriterion()` de `src/helpers/traceability.ts`, que anida `US-XXX` y `AC-XXX` y deja el `TC-<id>` en el título de cada prueba. En Allure, la historia aparece como Feature y el criterio como Story (pestaña Behaviors).
-
-  ```ts
-  acceptanceCriterion(
-    'US-001: Acceso al portal',
-    'AC-001: Autenticación y acceso al portal',
-    () => {
-      test('TC-33801: credenciales inválidas muestran el mismo error', async ({
-        page,
-      }) => {
-        // ...
-      });
-    }
-  );
-  ```
-
-- **Tipos de prueba**: 🤖 _Fully Automated_ (sin intervención humana) y 👤 _Human-in-the-Loop_ (flujo automatizado que requiere input manual, como un OTP). En los Test Cases Human-in-the-Loop se especifica qué input se ingresa manualmente. Las pruebas que lo automatizan usan `askHuman()` (`src/helpers/human-intervention.ts`), llevan la etiqueta `@human` (y `@visible` si la persona debe interactuar con la página, como en un CAPTCHA), no corren en `npm test` y se ejecutan con `npm run test:human` ([ADR-010](docs/adr/ADR-010-human-in-the-loop-tests.md)).
-- **API**: las pruebas usan el `APIRequestContext` de Playwright, tanto para REST como para GraphQL ([ADR-005](docs/adr/ADR-005-playwright-api-request-context.md)).
-- **Mocks**: las APIs HTTP se simulan con MSW desde `src/mocks/` ([ADR-003](docs/adr/ADR-003-msw-http-mocks.md)).
-- **Evidencias**: el trace se captura en todas las ejecuciones E2E (`trace: 'on'`); screenshots y videos solo cuando una prueba los requiere ([ADR-007](docs/adr/ADR-007-execution-evidence.md)).
+- **Organización**: los casos viven en `Test Cases/US-<id>/` con el nombre `TC-<id> - título`; su criterio de aceptación sale de la especificación del caso en `docs/specs/` ([ADR-004](docs/adr/ADR-004-katalon-allure-reporting.md)).
+- **Trazabilidad**: el nombre de cada caso empieza con el ID de su Test Case de Azure DevOps, uno por caso ([ADR-006](docs/adr/ADR-006-katalon-azure-devops-traceability.md)).
+- **Test Objects y Custom Keywords**: los selectores viven en el Object Repository; cada Custom Keyword hace una sola acción y no contiene aserciones ([ADR-008](docs/adr/ADR-008-groovy-code-style-codenarc.md)).
+- **Datos de prueba**: Execution Profiles por ambiente, Data Files sobre CSV y credenciales en variables de entorno ([ADR-007](docs/adr/ADR-007-katalon-test-data.md)).
+- **Tipos de prueba**: 🤖 _Fully Automated_ y 👤 _Human-in-the-Loop_. Los casos que piden un dato a una persona usan el Custom Keyword `askHuman()`, llevan la etiqueta `human` (y `visible` si la persona interactúa con la página) y viven en una Test Suite propia ([ADR-005](docs/adr/ADR-005-katalon-human-in-the-loop.md)).
+- **Evidencias**: log de ejecución, captura automática al fallar, video en web y capturas por paso clave en móvil; en API, request, response y verificaciones registrados en el log ([ADR-003](docs/adr/ADR-003-katalon-execution-evidence.md)).
 
 El detalle completo está en los [estándares](docs/standards/README.md).
 
 ## Reportes de ejecución
 
-- **Allure** (`allurerc.mjs`): el reporte se genera con `allure run` al terminar `npm test`. Guarda el historial en `.allure/history.jsonl`, lo que habilita tendencias y detección de tests inestables. Las categorías de fallos están en `playwright.config.ts`.
-- **JUnit**: `test-results/junit.xml`, en formato legible por máquina para publicarlo en Azure DevOps.
-- **Evidencias**: los adjuntos de cada prueba (trace, screenshot, video y evidencia de API en Playwright; screenshots, grabaciones y `commands.json` en Maestro) quedan en `allure-results/`, que es la fuente de la skill `generate-report`; los originales de Playwright, en `test-results/`.
-
-## Integración continua
-
-[azure-pipelines.yml](azure-pipelines.yml) instala dependencias y browsers, ejecuta `quality:check` y las pruebas, y publica los resultados JUnit, el reporte Allure y las evidencias como artefactos. El historial de Allure se conserva entre ejecuciones con `Cache@2`. Debes definir las variables `BASE_URL` y `API_BASE_URL` en el pipeline.
+- **Katalon** escribe en `tests/katalon/Reports/<fecha>/<suite>/<fecha>/` el `JUnit_Report.xml`, el `execution0.log`, las capturas y los videos.
+- **Allure** (`allurerc.mjs`): `npm run allure:katalon` convierte ese reporte con [scripts/katalon/junit-to-allure.mjs](scripts/katalon/junit-to-allure.mjs), adjunta las evidencias y genera el reporte. Guarda el historial en `.allure/history.jsonl`. `allure-results/` es la fuente de la skill `generate-report`.
 
 ## Calidad y flujo de trabajo
 
-- **Pre-commit**: Husky ejecuta lint-staged (ESLint y Prettier sobre `*.{ts,js}`, Prettier sobre `*.{json,md}`).
-- **Commits**: se siguen Conventional Commits ([ADR-004](docs/adr/ADR-004-conventional-commits.md)).
-- **Validaciones de arquitectura**: `npm run arch` comprueba que el código cumple los criterios verificables de los estándares ([scripts/arch/](scripts/arch/README.md)).
+- **Pre-commit**: Husky ejecuta lint-staged (ESLint y Prettier sobre `scripts/**/*.mjs`, Prettier sobre `*.{json,md}`).
+- **Mensajes de commit**: commitlint los valida en el hook `commit-msg`.
+- **Commits**: se siguen Conventional Commits ([ADR-001](docs/adr/ADR-001-conventional-commits.md)).
+- **Validaciones de arquitectura**: `npm run arch` comprueba que el repositorio cumple los criterios verificables de los estándares ([scripts/arch/](scripts/arch/README.md)).
 
 ## Documentación
 

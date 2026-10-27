@@ -4,6 +4,7 @@
 
 **Estado:** Ready
 **Tipo de prueba:** E2E
+**Tipo de ejecución:** 🤖 Fully Automated
 **Fecha:** 2026-10-26
 **Perspectiva:** Happy Path
 **Prioridad:** Alta

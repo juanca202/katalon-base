@@ -19,6 +19,7 @@ export function colorStatus(status) {
 }
 
 // Quita códigos ANSI — para comparar/contar líneas de protocolo aunque lleguen coloreadas.
+// eslint-disable-next-line no-control-regex -- el patrón es el código de escape ANSI
 const ANSI_RE = /\x1b\[[0-9;]*m/g;
 export function stripAnsi(text) {
   return text.replace(ANSI_RE, '');

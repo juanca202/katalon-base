@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>US-34266 / AC-001 (Casos de uso). Happy Path. Un usuario no autenticado entra al modo demo desde /auth. Selectores verificados contra el sistema desplegado.</description>
+   <name>TC-34285 - Acceso a demo desde auth</name>
+   <tag>GenAI,TC-34285,AC-001,US-34266,E2E,HappyPath,FullyAutomated</tag>
+   <integratedEntity>
+      <productName>TESTOPS</productName>
+      <properties>
+         <entry>
+            <key>createdByName</key>
+            <value>Juan Carlos Altamirano</value>
+         </entry>
+         <entry>
+            <key>lastModifiedByName</key>
+            <value>Juan Carlos Altamirano</value>
+         </entry>
+         <entry>
+            <key>createdByUuid</key>
+            <value>a821dfeb-e288-407d-8f4d-86b8fb215f70</value>
+         </entry>
+         <entry>
+            <key>lastModifiedByUuid</key>
+            <value>a821dfeb-e288-407d-8f4d-86b8fb215f70</value>
+         </entry>
+      </properties>
+      <type>TESTCASE</type>
+   </integratedEntity>
+   <comment></comment>
+   <origin>STUDIOASSIST</origin>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>d39ecb75-2ecc-4ab0-b27e-da798361a281</testCaseGuid>
+</TestCaseEntity>

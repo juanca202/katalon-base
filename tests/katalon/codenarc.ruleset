@@ -1,0 +1,19 @@
+// Reglas de CodeNarc para Scripts/, Keywords/ y Test Listeners/ (ADR-008).
+ruleset {
+    ruleset('rulesets/basic.xml')
+    ruleset('rulesets/braces.xml')
+    ruleset('rulesets/exceptions.xml')
+    ruleset('rulesets/imports.xml')
+    ruleset('rulesets/unused.xml')
+    ruleset('rulesets/naming.xml') {
+        // Constantes de los scripts en UPPER_SNAKE_CASE, declaradas final (coding-style: naming)
+        VariableName {
+            finalRegex = /[A-Z][A-Z0-9_]*/
+        }
+    }
+    ruleset('rulesets/unnecessary.xml') {
+        // Los scripts de Katalon encadenan llamadas a WebUI/Mobile/WS y usan sus getters (getUrl())
+        exclude 'UnnecessaryObjectReferences'
+        exclude 'UnnecessaryGetter'
+    }
+}

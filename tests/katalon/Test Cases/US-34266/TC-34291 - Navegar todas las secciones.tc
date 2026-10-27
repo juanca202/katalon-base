@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>US-34266 / AC-006 (Casos de uso). Happy Path. El usuario en modo demo navega por todas las secciones funcionales en solo lectura. Secciones observadas: Dashboard, Transactions, Budgets, Friends, Scheduled.</description>
+   <name>TC-34291 - Navegar todas las secciones</name>
+   <tag>GenAI,US-34266,E2E,AC-006,HappyPath,TC-34291,FullyAutomated</tag>
+   <integratedEntity>
+      <productName>TESTOPS</productName>
+      <properties>
+         <entry>
+            <key>createdByName</key>
+            <value>Juan Carlos Altamirano</value>
+         </entry>
+         <entry>
+            <key>lastModifiedByName</key>
+            <value>Juan Carlos Altamirano</value>
+         </entry>
+         <entry>
+            <key>createdByUuid</key>
+            <value>a821dfeb-e288-407d-8f4d-86b8fb215f70</value>
+         </entry>
+         <entry>
+            <key>lastModifiedByUuid</key>
+            <value>a821dfeb-e288-407d-8f4d-86b8fb215f70</value>
+         </entry>
+      </properties>
+      <type>TESTCASE</type>
+   </integratedEntity>
+   <comment></comment>
+   <origin>STUDIOASSIST</origin>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a8482b5c-3a9e-4c21-b1f4-3ed479c0ac94</testCaseGuid>
+</TestCaseEntity>

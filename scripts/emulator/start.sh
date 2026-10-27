@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Arranca el emulador Android para las pruebas de Maestro y espera a que
+# Arranca el emulador Android para las pruebas móviles de Katalon y espera a que
 # termine de iniciar. Crea el AVD si no existe.
 #
 # Uso: scripts/emulator/start.sh [avd]

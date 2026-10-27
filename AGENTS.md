@@ -9,13 +9,16 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 
 # Reglas generales
 
+- Responder siempre en español
 - Este es un proyecto de QA para testing de aplicaciones externas sin acceso al código fuente
-- Katalon Studio, en su edición gratuita, es el runner único de pruebas para web, API y apps móviles, ejecutado en local ([ADR-013](docs/adr/ADR-013-katalon-test-runner.md)); no usar funciones de Enterprise ni de Runtime Engine; no añadir pruebas nuevas con Playwright ni Maestro. Las existentes en `tests/playwright/` y `tests/maestro/` son legado en migración
-- El proyecto Katalon vive en `tests/katalon/`; los casos de prueba se organizan en `Test Cases/US-<id>: …/AC-<id>: …/TC-<id>: …` ([ADR-015](docs/adr/ADR-015-katalon-allure-reporting.md))
-- Cada caso que represente un Test Case de Azure DevOps empieza su nombre con `TC-<id>: `; tras ejecutar, los resultados se publican en Azure DevOps con el script del repositorio ([ADR-017](docs/adr/ADR-017-katalon-azure-devops-traceability.md))
-- Los elementos de la UI se definen como Test Objects en el Object Repository; los Custom Keywords hacen una sola acción y no contienen aserciones ([ADR-019](docs/adr/ADR-019-groovy-code-style-codenarc.md))
-- Los datos por ambiente van en Execution Profiles y las credenciales en variables de entorno, nunca versionadas ([ADR-018](docs/adr/ADR-018-katalon-test-data.md))
-- Mantener reportes claros usando Allure, alimentado por el JUnit de Katalon ([ADR-015](docs/adr/ADR-015-katalon-allure-reporting.md))
+- Katalon Studio, en su edición gratuita, es el runner único de pruebas para web, API y apps móviles, ejecutado en local ([ADR-002](docs/adr/ADR-002-katalon-test-runner.md)); no usar funciones de Enterprise ni de Runtime Engine
+- El proyecto Katalon vive en `tests/katalon/`; los casos de prueba se organizan en `Test Cases/US-<id>/TC-<id> - título` (sin `:`); el criterio AC se toma de la especificación del caso ([ADR-004](docs/adr/ADR-004-katalon-allure-reporting.md))
+- Cada caso que represente un Test Case de Azure DevOps empieza su nombre con `TC-<id> - `; tras ejecutar, los resultados se publican en Azure DevOps con el script del repositorio ([ADR-006](docs/adr/ADR-006-katalon-azure-devops-traceability.md))
+- Los elementos de la UI se definen como Test Objects en el Object Repository; los Custom Keywords hacen una sola acción y no contienen aserciones ([ADR-008](docs/adr/ADR-008-groovy-code-style-codenarc.md))
+- Los datos por ambiente van en Execution Profiles y las credenciales en variables de entorno, nunca versionadas ([ADR-007](docs/adr/ADR-007-katalon-test-data.md))
+- Los casos que piden un dato a una persona usan el keyword `askHuman()`, llevan la etiqueta `human` y van en su propia Test Suite ([ADR-005](docs/adr/ADR-005-katalon-human-in-the-loop.md))
+- Tras ejecutar una Test Suite en Katalon Studio, generar el reporte con `npm run allure:katalon` y publicar en Azure DevOps con `npm run ado:publish` ([ADR-004](docs/adr/ADR-004-katalon-allure-reporting.md))
+- Antes de abrir un pull request: `npm run quality:check`, `npm run arch` y `npm run codenarc`. Commits con Conventional Commits ([ADR-001](docs/adr/ADR-001-conventional-commits.md))
 
 # Stack tecnológico
 
@@ -31,9 +34,8 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 - **CodeNarc** - Análisis estático del código Groovy (tarea de Gradle del proyecto Katalon)
 - **ESLint 10.11.0** y **Prettier 3.9.8** - Lint y formato de los scripts Node y de `*.json`/`*.md`
 
-## Integración y CI/CD
+## Integración
 
-- **Azure Pipelines** - Ejecuta las validaciones estáticas (CodeNarc, `npm run arch`, lint); no ejecuta las pruebas
 - **Script de publicación en Azure DevOps** - Tras cada ejecución local, crea el test run en el Test Plan y registra el resultado de cada `TC-<id>` (API REST de Azure DevOps)
 - **Husky 9.1.7** - Git hooks para pre-commit
 
@@ -41,7 +43,3 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 
 - **Tripot** (finanzas personales, web) - sistema externo; su código no vive en este repositorio
 - Las URLs salen de los Execution Profiles de Katalon; las credenciales, de variables de entorno del equipo que ejecuta, y nunca se versionan
-
-## Legado en migración
-
-- **Playwright 1.63.0 + TypeScript 6.0.3** (`tests/playwright/`, `playwright.config.ts`) y **Maestro** (`tests/maestro/`): siguen ejecutándose hasta migrar sus pruebas a Katalon
