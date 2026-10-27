@@ -4,11 +4,4 @@
    <name>default</name>
    <tag></tag>
    <defaultProfile>true</defaultProfile>
-   <GlobalVariableEntity>
-      <description>URL base del sistema bajo prueba Tripot (modo demo). La ruta /auth se concatena en los test cases.</description>
-      <initValue>'https://factor.ec/tripot'</initValue>
-      <name>G_BaseUrl</name>
-      <protected>false</protected>
-      <valueType>STRING</valueType>
-   </GlobalVariableEntity>
 </GlobalVariableEntities>

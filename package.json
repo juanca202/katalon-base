@@ -1,7 +1,7 @@
 {
   "name": "test-katalon",
   "version": "1.0.0",
-  "description": "Pruebas automatizadas de Tripot con Katalon Studio",
+  "description": "Proyecto base de pruebas automatizadas con Katalon Studio",
   "scripts": {
     "allure:katalon": "npm run clean:results && node scripts/katalon/junit-to-allure.mjs && npm run allure:serve",
     "allure:generate": "rm -rf allure-report && allure generate allure-results",

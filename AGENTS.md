@@ -16,7 +16,7 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 - Cada caso que represente un Test Case de Azure DevOps empieza su nombre con `TC-<id> - `; tras ejecutar, los resultados se publican en Azure DevOps con el script del repositorio ([ADR-006](docs/adr/ADR-006-katalon-azure-devops-traceability.md))
 - Los elementos de la UI se definen como Test Objects en el Object Repository; los Custom Keywords hacen una sola acción y no contienen aserciones ([ADR-008](docs/adr/ADR-008-groovy-code-style-codenarc.md))
 - Los datos por ambiente van en Execution Profiles y las credenciales en variables de entorno, nunca versionadas ([ADR-007](docs/adr/ADR-007-katalon-test-data.md))
-- Los casos que piden un dato a una persona usan el keyword `askHuman()`, llevan la etiqueta `human` y van en su propia Test Suite ([ADR-005](docs/adr/ADR-005-katalon-human-in-the-loop.md))
+- Los casos que piden un dato a una persona usan el keyword `askHuman()` (pendiente de implementar en `Keywords/`), llevan la etiqueta `human` y van en su propia Test Suite ([ADR-005](docs/adr/ADR-005-katalon-human-in-the-loop.md))
 - Tras ejecutar una Test Suite en Katalon Studio, generar el reporte con `npm run allure:katalon` y publicar en Azure DevOps con `npm run ado:publish` ([ADR-004](docs/adr/ADR-004-katalon-allure-reporting.md))
 - Antes de abrir un pull request: `npm run quality:check`, `npm run arch` y `npm run codenarc`. Commits con Conventional Commits ([ADR-001](docs/adr/ADR-001-conventional-commits.md))
 
@@ -37,9 +37,10 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 ## Integración
 
 - **Script de publicación en Azure DevOps** - Tras cada ejecución local, crea el test run en el Test Plan y registra el resultado de cada `TC-<id>` (API REST de Azure DevOps)
+- **Servidores MCP** (`.mcp.json`) - Katalon Studio (local) y Azure DevOps (PAT en `ADO_BAY_JUA_PAT`) para agentes de IA
 - **Husky 9.1.7** - Git hooks para pre-commit
 
 ## Sistema bajo prueba
 
-- **Tripot** (finanzas personales, web) - sistema externo; su código no vive en este repositorio
+- Sistema externo por definir; su código no vive en este repositorio
 - Las URLs salen de los Execution Profiles de Katalon; las credenciales, de variables de entorno del equipo que ejecuta, y nunca se versionan

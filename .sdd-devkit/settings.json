@@ -37,10 +37,6 @@
     "push": "never"
   },
   "projectManagement": {
-    "enabled": true,
-    "provider": "azure-devops",
-    "host": "https://dev.azure.com",
-    "workspace": "BayteqDev",
-    "project": "Bayteq IA"
+    "enabled": false
   }
 }

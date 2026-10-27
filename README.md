@@ -1,13 +1,13 @@
 # test-katalon
 
-Pruebas automatizadas de [Tripot](https://factor.ec/tripot), un sistema web de administración de finanzas personales. El código de Tripot no vive en este repositorio: las pruebas se ejecutan contra la aplicación desplegada.
+Proyecto base de pruebas automatizadas con Katalon Studio para sistemas externos. El código del sistema bajo prueba no vive en este repositorio: las pruebas se ejecutan contra la aplicación desplegada.
 
 Katalon Studio, en su edición gratuita, es el runner único de pruebas para web, API y apps móviles ([ADR-002](docs/adr/ADR-002-katalon-test-runner.md)). Las pruebas se ejecutan en local desde Katalon Studio, y sus resultados se publican en Allure y en los Test Cases de Azure DevOps.
 
 ## Características principales
 
 - 🧪 **Katalon Studio**: E2E web, API y apps nativas o híbridas Android e iOS, con Object Repository y Custom Keywords en Groovy
-- 📊 **Allure Reports**: historial, tendencias y árbol Historia → Criterio → Caso de prueba
+- 📊 **Allure Reports**: historial, tendencias y árbol Tipo → Plataforma → Historia → Criterio → Caso de prueba
 - 🔎 **Evidencias de ejecución**: log paso a paso, capturas y video en web ([ADR-003](docs/adr/ADR-003-katalon-execution-evidence.md))
 - 🔗 **Trazabilidad con Azure DevOps**: cada caso se identifica con su Test Case (`TC-<id>`)
 - 🏛️ **Arquitectura documentada y verificable**: ADRs, estándares y validaciones automáticas (`npm run arch`)
@@ -25,15 +25,15 @@ Katalon Studio, en su edición gratuita, es el runner único de pruebas para web
 
 ```
 ├── tests/
-│   ├── katalon/            # Proyecto Katalon Studio
-│   │   ├── Test Cases/    # Casos por historia: US-<id>/TC-<id> - título
-│   │   ├── Scripts/       # Scripts Groovy de los casos
-│   │   ├── Object Repository/ # Test Objects
-│   │   ├── Test Suites/   # Suites por historia
-│   │   ├── Keywords/      # Custom Keywords
-│   │   ├── Profiles/      # Execution Profiles por ambiente
-│   │   └── Reports/       # Resultados de ejecución (no versionado)
-│   └── data/               # Datasets de prueba
+│   └── katalon/            # Proyecto Katalon Studio
+│       ├── Test Cases/    # Casos por historia: US-<id>/TC-<id> - título
+│       ├── Scripts/       # Scripts Groovy de los casos
+│       ├── Object Repository/ # Test Objects
+│       ├── Test Suites/   # Suites por historia
+│       ├── Keywords/      # Custom Keywords
+│       ├── Test Listeners/ # Listeners de ejecución
+│       ├── Profiles/      # Execution Profiles por ambiente
+│       └── Reports/       # Resultados de ejecución (no versionado)
 ├── scripts/
 │   ├── katalon/           # Conversión a Allure y publicación en Azure DevOps
 │   ├── arch/              # Validaciones de arquitectura (fitness functions)
@@ -46,9 +46,10 @@ Katalon Studio, en su edición gratuita, es el runner único de pruebas para web
 │   └── specs/            # Especificaciones de trabajo (SDD DevKit)
 ├── allurerc.mjs           # Configuración de Allure (historial y reporte)
 ├── .env.example           # Variables de entorno (credenciales, PAT de Azure DevOps)
+├── .mcp.json              # Servidores MCP para agentes (Katalon Studio y Azure DevOps)
 ├── AGENTS.md              # Reglas del proyecto y stack para agentes de IA
-├── .agents/               # Memoria persistente del proyecto
-├── .kiro/                 # Skills de Kiro (p. ej. generate-report)
+├── .agents/               # Memoria persistente y skills del proyecto (p. ej. generate-report)
+├── .kiro/                 # Memoria y skills de Kiro (p. ej. generate-report)
 ├── .sdd-devkit/           # Configuración de SDD DevKit
 └── .husky/                # Git hooks (pre-commit con lint-staged)
 ```
@@ -72,7 +73,7 @@ Katalon Studio, en su edición gratuita, es el runner único de pruebas para web
 
 3. **Abrir el proyecto** `tests/katalon/` en Katalon Studio. En Project > Settings > Execution, activar la grabación de video con **Screen Recorder** para todos los casos y la captura automática al fallar.
 
-4. **Ejecutar una Test Suite** desde Katalon Studio (por ejemplo `Test Suites/US-34266/TS - US-34266 Acceso demo`).
+4. **Ejecutar una Test Suite** desde Katalon Studio (por ejemplo `Test Suites/US-<id>/TS - US-<id> <título>`).
 
 5. **Generar y abrir el reporte de Allure**:
 
@@ -105,7 +106,7 @@ Katalon Studio, en su edición gratuita, es el runner único de pruebas para web
 - **Trazabilidad**: el nombre de cada caso empieza con el ID de su Test Case de Azure DevOps, uno por caso ([ADR-006](docs/adr/ADR-006-katalon-azure-devops-traceability.md)).
 - **Test Objects y Custom Keywords**: los selectores viven en el Object Repository; cada Custom Keyword hace una sola acción y no contiene aserciones ([ADR-008](docs/adr/ADR-008-groovy-code-style-codenarc.md)).
 - **Datos de prueba**: Execution Profiles por ambiente, Data Files sobre CSV y credenciales en variables de entorno ([ADR-007](docs/adr/ADR-007-katalon-test-data.md)).
-- **Tipos de prueba**: 🤖 _Fully Automated_ y 👤 _Human-in-the-Loop_. Los casos que piden un dato a una persona usan el Custom Keyword `askHuman()`, llevan la etiqueta `human` (y `visible` si la persona interactúa con la página) y viven en una Test Suite propia ([ADR-005](docs/adr/ADR-005-katalon-human-in-the-loop.md)).
+- **Tipos de prueba**: 🤖 _Fully Automated_ y 👤 _Human-in-the-Loop_. Los casos que piden un dato a una persona usan el Custom Keyword `askHuman()` (pendiente de implementar en `Keywords/`), llevan la etiqueta `human` (y `visible` si la persona interactúa con la página) y viven en una Test Suite propia ([ADR-005](docs/adr/ADR-005-katalon-human-in-the-loop.md)).
 - **Evidencias**: log de ejecución, captura automática al fallar, video en web y capturas por paso clave en móvil; en API, request, response y verificaciones registrados en el log ([ADR-003](docs/adr/ADR-003-katalon-execution-evidence.md)).
 
 El detalle completo está en los [estándares](docs/standards/README.md).
