@@ -22,19 +22,24 @@ WebUI.waitForElementVisible(obj('lbl_DemoModeBanner'), LOAD_TIMEOUT)
 WebUI.waitForElementClickable(obj('btn_Add'), TIMEOUT)
 WebUI.click(obj('btn_Add'))
 WebUI.waitForElementClickable(obj('btn_AddExpense'), TIMEOUT)
+CustomKeywords.'tripot.common.Waits.waitForElementSteady'(obj('btn_AddExpense'), TIMEOUT)
 WebUI.click(obj('btn_AddExpense'))
 WebUI.waitForElementVisible(obj('txt_TransactionDescription'), TIMEOUT)
-WebUI.waitForElementClickable(obj('btn_Numpad5'), TIMEOUT)
-WebUI.click(obj('btn_Numpad5'))
+CustomKeywords.'tripot.web.TransactionFormScreen.typeAmount'('5')
 WebUI.setText(obj('txt_TransactionDescription'), 'Demo test expense')
+WebUI.waitForElementClickable(obj('btn_Category'), TIMEOUT)
+WebUI.click(obj('btn_Category'))
+WebUI.waitForElementClickable(obj('btn_CategoryGrocery'), TIMEOUT)
+CustomKeywords.'tripot.common.Waits.waitForElementSteady'(obj('btn_CategoryGrocery'), TIMEOUT)
+WebUI.click(obj('btn_CategoryGrocery'))
 WebUI.waitForElementClickable(obj('btn_SaveTransaction'), TIMEOUT)
 WebUI.click(obj('btn_SaveTransaction'))
 
 // ===== Verificación =====
-'El modo demo muestra el modal con las opciones de iniciar sesión y registrarse'
+'El modo demo muestra el modal con las opciones de iniciar sesión o registrarse (Google o email)'
 WebUI.waitForElementVisible(obj('dlg_AuthRequired'), TIMEOUT)
-WebUI.verifyElementVisible(obj('btn_ModalSignIn'))
-WebUI.verifyElementVisible(obj('btn_ModalSignUp'))
+WebUI.verifyElementVisible(obj('btn_ModalContinueWithGoogle'))
+WebUI.verifyElementVisible(obj('btn_ModalContinueWithEmail'))
 
 'La operación no se completó: el usuario sigue en el modo demo'
 WebUI.verifyElementVisible(obj('lbl_DemoModeBanner'))

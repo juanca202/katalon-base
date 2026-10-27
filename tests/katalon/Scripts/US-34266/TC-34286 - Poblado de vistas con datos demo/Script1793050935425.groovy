@@ -9,12 +9,12 @@ def obj = { String name -> findTestObject('Object Repository/US-34266/' + name) 
 final int LOAD_TIMEOUT = 15
 final int TIMEOUT = 10
 
-// Abre una sección desde la navegación y devuelve la URL una vez cargada
-def openSection = { String navObject ->
+// Abre una sección desde la navegación y espera un dato del demo propio de esa sección.
+// El banner de modo demo solo se muestra en el Dashboard, por eso no sirve como señal de carga.
+def openSection = { String navObject, String markerObject ->
     WebUI.waitForElementClickable(obj(navObject), TIMEOUT)
     WebUI.click(obj(navObject))
-    WebUI.waitForElementVisible(obj('lbl_DemoModeBanner'), LOAD_TIMEOUT)
-    WebUI.getUrl()
+    WebUI.waitForElementVisible(obj(markerObject), LOAD_TIMEOUT)
 }
 
 // ===== Preparación =====
@@ -28,13 +28,12 @@ WebUI.waitForElementVisible(obj('lbl_DemoModeBanner'), LOAD_TIMEOUT)
 // ===== Acción =====
 'Recorrer las secciones y registrar los datos ficticios que muestra cada una'
 boolean dashboardHasData = WebUI.waitForElementVisible(obj('lbl_RecentTransactions'), TIMEOUT)
-String transactionsUrl = openSection('nav_Transactions')
-boolean transactionsHasData = WebUI.waitForElementVisible(obj('lbl_TransactionMonthlySalary'), TIMEOUT)
-String budgetsUrl = openSection('nav_Budgets')
-openSection('nav_Friends')
-boolean friendsLoaded = WebUI.waitForElementVisible(obj('lbl_DemoModeBanner'), TIMEOUT)
-openSection('nav_Scheduled')
-boolean scheduledLoaded = WebUI.waitForElementVisible(obj('lbl_DemoModeBanner'), TIMEOUT)
+boolean transactionsHasData = openSection('nav_Transactions', 'lbl_TransactionMonthlySalary')
+String transactionsUrl = WebUI.getUrl()
+boolean budgetsHasData = openSection('nav_Budgets', 'lbl_BudgetGrocery')
+String budgetsUrl = WebUI.getUrl()
+boolean friendsHasData = openSection('nav_Friends', 'lbl_FriendAlexRivera')
+boolean scheduledHasData = openSection('nav_Scheduled', 'lbl_ScheduledHealthInsurance')
 
 // ===== Verificación =====
 'Dashboard: muestra las transacciones recientes del demo'
@@ -44,7 +43,10 @@ WebUI.verifyEqual(dashboardHasData, true)
 WebUI.verifyMatch(transactionsUrl, '.*/transactions.*', true)
 WebUI.verifyEqual(transactionsHasData, true)
 
-'Budgets, Friends y Scheduled: las secciones cargan en modo demo'
+'Budgets: la sección carga los presupuestos del demo'
 WebUI.verifyMatch(budgetsUrl, '.*/budgets.*', true)
-WebUI.verifyEqual(friendsLoaded, true)
-WebUI.verifyEqual(scheduledLoaded, true)
+WebUI.verifyEqual(budgetsHasData, true)
+
+'Friends y Scheduled: las secciones cargan los contactos y las transacciones programadas del demo'
+WebUI.verifyEqual(friendsHasData, true)
+WebUI.verifyEqual(scheduledHasData, true)

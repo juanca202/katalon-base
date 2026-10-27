@@ -1,6 +1,5 @@
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
-import org.openqa.selenium.Keys as Keys
 import internal.GlobalVariable as GlobalVariable
 
 // US-34266 - TC-34294 - AC-009: El modal permite volver a la demo sin registro ni login (Happy Path)
@@ -22,18 +21,25 @@ WebUI.waitForElementVisible(obj('lbl_DemoModeBanner'), LOAD_TIMEOUT)
 WebUI.waitForElementClickable(obj('btn_Add'), TIMEOUT)
 WebUI.click(obj('btn_Add'))
 WebUI.waitForElementClickable(obj('btn_AddExpense'), TIMEOUT)
+CustomKeywords.'tripot.common.Waits.waitForElementSteady'(obj('btn_AddExpense'), TIMEOUT)
 WebUI.click(obj('btn_AddExpense'))
 WebUI.waitForElementVisible(obj('txt_TransactionDescription'), TIMEOUT)
-WebUI.waitForElementClickable(obj('btn_Numpad5'), TIMEOUT)
-WebUI.click(obj('btn_Numpad5'))
+CustomKeywords.'tripot.web.TransactionFormScreen.typeAmount'('5')
 WebUI.setText(obj('txt_TransactionDescription'), 'Demo back to demo')
+WebUI.waitForElementClickable(obj('btn_Category'), TIMEOUT)
+WebUI.click(obj('btn_Category'))
+WebUI.waitForElementClickable(obj('btn_CategoryGrocery'), TIMEOUT)
+CustomKeywords.'tripot.common.Waits.waitForElementSteady'(obj('btn_CategoryGrocery'), TIMEOUT)
+WebUI.click(obj('btn_CategoryGrocery'))
 WebUI.waitForElementClickable(obj('btn_SaveTransaction'), TIMEOUT)
 WebUI.click(obj('btn_SaveTransaction'))
 WebUI.waitForElementVisible(obj('dlg_AuthRequired'), TIMEOUT)
 
 // ===== Acción =====
-'Cerrar el modal sin registrarse ni iniciar sesión (Escape; mecanismo por confirmar)'
-WebUI.sendKeys(obj('dlg_AuthRequired'), Keys.chord(Keys.ESCAPE))
+'Volver a la demo desde el modal, sin registrarse ni iniciar sesión'
+WebUI.waitForElementClickable(obj('btn_ModalBackToDemo'), TIMEOUT)
+CustomKeywords.'tripot.common.Waits.waitForElementSteady'(obj('btn_ModalBackToDemo'), TIMEOUT)
+WebUI.click(obj('btn_ModalBackToDemo'))
 
 // ===== Verificación =====
 'El modal se cerró y el usuario sigue en el modo demo'
