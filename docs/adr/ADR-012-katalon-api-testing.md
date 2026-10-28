@@ -1,7 +1,7 @@
 ---
 id: ADR-012
-status: Draft
-last_update: 2026-10-26
+status: Accepted
+last_update: 2026-10-27
 deciders: [Equipo de QA]
 tags: [testing, api, rest, graphql, katalon, json-schema]
 supersedes: null

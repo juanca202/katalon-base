@@ -1,7 +1,7 @@
 ---
 id: ADR-013
-status: Draft
-last_update: 2026-10-26
+status: Accepted
+last_update: 2026-10-27
 deciders: [Equipo de QA]
 tags: [testing, visual-regression, screenshots, katalon]
 supersedes: null
