@@ -76,7 +76,12 @@ if (!pm.enabled || pm.provider !== 'azure-devops') {
     'projectManagement de .sdd-devkit/settings.json no apunta a Azure DevOps.'
   );
 }
-const baseUrl = `${pm.host.replace(/\/+$/, '')}/${encodeURIComponent(pm.workspace)}/${encodeURIComponent(pm.project)}/_apis`;
+// `host` puede venir con o sin la organización (dev.azure.com[/<org>]).
+const host = pm.host.replace(/\/+$/, '');
+const orgUrl = host.endsWith(`/${pm.workspace}`)
+  ? host
+  : `${host}/${encodeURIComponent(pm.workspace)}`;
+const baseUrl = `${orgUrl}/${encodeURIComponent(pm.project)}/_apis`;
 const planId = Number(args.plan ?? process.env.ADO_TEST_PLAN_ID);
 
 const junitPath = resolveJUnit(args.junit);
