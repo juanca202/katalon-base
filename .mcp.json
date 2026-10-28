@@ -1,10 +1,15 @@
 {
   "mcpServers": {
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp",
+      "disabled": true
+    },
     "katalon-studio": {
       "type": "http",
       "url": "http://localhost:33699/mcp/stream"
     },
-    "ado-bay-jua": {
+    "ado-bayteq": {
       "type": "stdio",
       "command": "npx",
       "args": [
@@ -15,7 +20,7 @@
         "pat"
       ],
       "env": {
-        "PERSONAL_ACCESS_TOKEN": "${ADO_BAY_JUA_PAT}"
+        "PERSONAL_ACCESS_TOKEN": "${ADO_PAT_BAYTEQ}"
       }
     }
   }
