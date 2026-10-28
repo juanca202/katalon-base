@@ -115,7 +115,7 @@ Si el sistema bajo prueba no permite borrar un recurso, la prueba no usa ese rec
 
 > Decisión de origen: [ADR-003](../adr/ADR-003-katalon-execution-evidence.md).
 
-Toda ejecución automatizada **DEBE** producir evidencia, tanto si la prueba pasa como si falla. El tipo de evidencia se selecciona según el tipo de prueba:
+Toda ejecución automatizada **DEBE** producir evidencia, tanto si la prueba pasa como si falla. El keyword es [ApiRequest.send()](../../tests/katalon/Keywords/com/bayteq/qa/common/ApiRequest.groovy), que prefija los registros con `[API-REQUEST]` y `[API-RESPONSE]`; la conversión a Allure los adjunta a cada caso como "API request y response". El tipo de evidencia se selecciona según el tipo de prueba:
 
 | Tipo de prueba               | Evidencia                                                                                |
 | ---------------------------- | ---------------------------------------------------------------------------------------- |
@@ -156,7 +156,7 @@ Los casos de prueba que no representan un Test Case de Azure DevOps no declaran 
 
 > Decisión de origen: [ADR-004](../adr/ADR-004-katalon-allure-reporting.md).
 
-Tras cada ejecución de una Test Suite, **DEBE** generarse un reporte de Allure a partir del `JUnit_Report.xml` que Katalon escribe en `Reports/`, convertido a `allure-results/` con las evidencias adjuntas por [scripts/katalon/junit-to-allure.mjs](../../scripts/katalon/junit-to-allure.mjs) (`npm run allure:katalon`). Los videos AVI o MOV del Screen Recorder se adjuntan convertidos a MP4 (H.264) cuando ffmpeg está disponible, para que se reproduzcan en el navegador. El reporte **DEBE** conservar el historial de ejecuciones, configurado en `allurerc.mjs`, para habilitar tendencias y detección de pruebas inestables, y **DEBE** adjuntarse al test run de Azure DevOps.
+Tras cada ejecución de una Test Suite, **DEBE** generarse un reporte de Allure a partir del `JUnit_Report.xml` que Katalon escribe en `Reports/`, convertido a `allure-results/` con las evidencias adjuntas por [scripts/katalon/junit-to-allure.mjs](../../scripts/katalon/junit-to-allure.mjs) (`npm run allure:katalon`). Los resultados **DEBEN** acumularse entre corridas: una corrida parcial solo reemplaza los casos ejecutados, y `allure-results/` solo se vacía con `npm run allure:katalon:reset` cuando el equipo lo decide. Los videos AVI o MOV del Screen Recorder se adjuntan convertidos a MP4 (H.264) cuando ffmpeg está disponible, para que se reproduzcan en el navegador. El reporte **DEBE** conservar el historial de ejecuciones, configurado en `allurerc.mjs`, para habilitar tendencias y detección de pruebas inestables, y **DEBE** adjuntarse al test run de Azure DevOps.
 
 ### Excepciones
 

@@ -354,7 +354,7 @@ Documenta, por historia de usuario, la evidencia de ejecución de sus casos. La 
 - Obligatorio: códigos `US-XXX` (Regla global). Los TCs de cada US se listan desde `docs/specs/changes/user-stories/US-XXX-*/test-cases/README.md`.
 - Verificar que `allure-results/` exista y tenga archivos `*-result.json`. Si no, avisar que hay que ejecutar la Test Suite en Katalon Studio y luego `npm run allure:katalon`, y detenerse; no fabricar evidencia.
 - Informar la fecha/hora de la corrida (`start` del primer resultado y `stop` del último, en milisegundos epoch) y avisar si es anterior a los últimos cambios de las pruebas.
-- `npm run allure:katalon` limpia `allure-results/` al iniciar, así que contiene solo la última ejecución convertida.
+- `npm run allure:katalon` acumula resultados: una corrida parcial solo reemplaza los casos ejecutados. `allure-results/` se vacía únicamente con `npm run allure:katalon:reset`, cuando el usuario lo pide.
 
 ### 2. Extraer la evidencia de `allure-results/`
 

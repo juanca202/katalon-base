@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Proyecto base de pruebas automatizadas con Katalon Studio",
   "scripts": {
-    "allure:katalon": "npm run clean:results && node scripts/katalon/junit-to-allure.mjs && npm run allure:serve",
+    "allure:katalon": "node scripts/katalon/junit-to-allure.mjs && npm run allure:serve",
+    "allure:katalon:reset": "npm run clean:results && npm run allure:katalon",
     "allure:generate": "rm -rf allure-report && allure generate allure-results",
     "allure:serve": "rm -rf allure-report && allure generate allure-results --open",
     "allure:open": "allure open allure-report",

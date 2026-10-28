@@ -10,6 +10,9 @@
 // especificación del caso en docs/specs (TC-<id>-*.md), que declara su
 // criterio de aceptación y su historia padre.
 //
+// Los resultados se acumulan: una corrida parcial solo reemplaza los casos que
+// ejecutó y conserva el resto. Para empezar de cero, `npm run allure:katalon:reset`.
+//
 // Uso: node scripts/katalon/junit-to-allure.mjs [JUnit_Report.xml] [allure-results] [plataforma]
 //   Sin argumentos toma el JUnit_Report.xml más reciente de tests/katalon/Reports.
 import { spawnSync } from 'node:child_process';
@@ -18,7 +21,9 @@ import {
   copyFileSync,
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { basename, dirname, extname, join } from 'node:path';
@@ -91,7 +96,30 @@ function specFor(tcId) {
 // Evidencias del reporte: el log de la ejecución va a todos los casos; las
 // capturas y videos, al caso cuyo TC-<id> o nombre aparece en su ruta.
 mkdirSync(outDir, { recursive: true });
-const { logs, media, attachments } = reportEvidence(reportDir);
+
+// Elimina los resultados previos del mismo caso (y sus adjuntos) para que la
+// nueva ejecución lo reemplace sin tocar los demás casos.
+function removePrevious(historyId) {
+  const results = readdirSync(outDir)
+    .filter(file => file.endsWith('-result.json'))
+    .map(file => ({
+      path: join(outDir, file),
+      data: JSON.parse(readFileSync(join(outDir, file), 'utf8')),
+    }));
+  const replaced = results.filter(r => r.data.historyId === historyId);
+  const kept = new Set(
+    results
+      .filter(r => r.data.historyId !== historyId)
+      .flatMap(r => (r.data.attachments ?? []).map(a => a.source))
+  );
+  for (const { path, data } of replaced) {
+    for (const { source } of data.attachments ?? [])
+      if (!kept.has(source)) rmSync(join(outDir, source), { force: true });
+    rmSync(path, { force: true });
+  }
+}
+
+const { logs, media, attachments, apiEvidence } = reportEvidence(reportDir);
 const sharedLogs = logs.map(file => {
   const source = `${randomUUID()}-attachment.log`;
   copyFileSync(file, join(outDir, source));
@@ -158,6 +186,15 @@ function attachMedia(tc) {
   });
 }
 
+// Request y response de la API de un caso, como un adjunto de texto.
+function attachApi(tc) {
+  const text = apiEvidence.get(tc.name);
+  if (!text) return [];
+  const source = `${randomUUID()}-attachment.txt`;
+  writeFileSync(join(outDir, source), text);
+  return [{ name: 'API request y response', source, type: MIME['.txt'] }];
+}
+
 const cases = parseJUnit(readFileSync(junitPath, 'utf8'));
 for (const tc of cases) {
   const spec = tc.tcId ? specFor(tc.tcId) : {};
@@ -184,8 +221,9 @@ for (const tc of cases) {
     links: spec.workItemUrl
       ? [{ name: `TC-${tc.tcId}`, url: spec.workItemUrl, type: 'tms' }]
       : [],
-    attachments: [...attachMedia(tc), ...sharedLogs],
+    attachments: [...attachApi(tc), ...attachMedia(tc), ...sharedLogs],
   };
+  removePrevious(result.historyId);
   writeFileSync(
     join(outDir, `${result.uuid}-result.json`),
     JSON.stringify(result, null, 2)

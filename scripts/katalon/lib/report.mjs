@@ -139,6 +139,29 @@ function attachmentsByCase(logs) {
   return byCase;
 }
 
+// Request y response de las llamadas API: el keyword ApiRequest.send() los
+// registra en el log con los prefijos [API-REQUEST] y [API-RESPONSE] (ADR-003).
+// Se agrupan por caso y se devuelven como texto, en orden de ejecución.
+function apiEvidenceByCase(logs) {
+  const byCase = new Map();
+  let current = null;
+  for (const log of logs) {
+    for (const [, start, message] of readFileSync(log, 'utf8').matchAll(
+      /<message>Start Test Case : ([^<]+)<\/message>|<message>(\[API-(?:REQUEST|RESPONSE)\][\s\S]*?)<\/message>/g
+    )) {
+      if (start) {
+        current = decode(start).trim();
+      } else if (current) {
+        const text = decode(message).trim();
+        byCase.set(current, [...(byCase.get(current) ?? []), text]);
+      }
+    }
+  }
+  return new Map(
+    [...byCase].map(([name, entries]) => [name, entries.join('\n\n---\n\n')])
+  );
+}
+
 // Archivos de evidencia de la carpeta del reporte.
 export function reportEvidence(reportDir) {
   const files = walk(reportDir);
@@ -153,6 +176,7 @@ export function reportEvidence(reportDir) {
     logs,
     media: files.filter(file => MEDIA.has(extname(file).toLowerCase())),
     attachments: attachmentsByCase(logs),
+    apiEvidence: apiEvidenceByCase(logs),
   };
 }
 

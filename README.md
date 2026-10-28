@@ -89,7 +89,8 @@ Katalon Studio, en su edición gratuita, es el runner único de pruebas para web
 
 ## Scripts disponibles
 
-- `npm run allure:katalon` - Convierte la última ejecución de Katalon (`tests/katalon/Reports/`) y abre el reporte de Allure
+- `npm run allure:katalon` - Convierte la última ejecución de Katalon (`tests/katalon/Reports/`) y abre el reporte de Allure. Acumula: una corrida parcial solo reemplaza los casos que ejecutó
+- `npm run allure:katalon:reset` - Borra `allure-results` y `allure-report` y regenera el reporte desde cero (solo cuando se decida empezar de nuevo)
 - `npm run ado:publish` - Publica la última ejecución en el Test Plan de Azure DevOps (`ADO_PAT` y `ADO_TEST_PLAN_ID`; `-- --dry-run` para revisar sin publicar)
 - `npm run allure:generate` / `npm run allure:serve` / `npm run allure:open` - Generar, generar y abrir, o abrir el reporte de Allure
 - `npm run lint` / `npm run lint:fix` - ESLint sobre `scripts/`
