@@ -34,7 +34,9 @@ class ApiRequest {
 
     private static String describeRequest(RequestObject request) {
         String headers = request.httpHeaderProperties.collect { "${it.name}: ${maskSecret(it.name, it.value)}" }.join('\n')
-        return "${request.restRequestMethod} ${request.restUrl}\n${headers}\n\n${truncate(request.httpBody)}"
+        // Una petición sin cuerpo (p. ej. GET) tiene bodyContent nulo y getHttpBody() falla
+        String body = request.bodyContent == null ? '' : request.httpBody
+        return "${request.restRequestMethod} ${request.restUrl}\n${headers}\n\n${truncate(body)}"
     }
 
     private static String describeResponse(ResponseObject response) {
