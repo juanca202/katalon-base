@@ -192,8 +192,16 @@ function solid(paints) {
 }
 
 const px = value => `${Math.round(value ?? 0)}px`;
+// Texto de un nodo, con los espacios normalizados y las comas como &comma;
+// porque el CSV no admite comas dentro de un campo.
+const content = node =>
+  (node.textData?.characters ?? '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replaceAll(',', '&comma;');
 
 const PROPERTIES = {
+  text: content,
   'font-family': style => style.fontName.family,
   'font-size': style => px(style.fontSize),
   'font-weight': style =>
@@ -205,6 +213,8 @@ const PROPERTIES = {
   'border-top-color': node => solid(node.strokePaints),
   'border-top-width': node =>
     solid(node.strokePaints) === '#00000000' ? '0px' : px(node.strokeWeight),
+  'border-top-left-radius': node =>
+    px(node.rectangleTopLeftCornerRadius ?? node.cornerRadius),
   'padding-left': node => px(node.stackHorizontalPadding),
   'padding-right': node =>
     px(node.stackPaddingRight ?? node.stackHorizontalPadding),

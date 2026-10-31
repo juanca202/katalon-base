@@ -96,7 +96,7 @@ function specFor(tcId) {
   if (!file) return {};
   const meta = frontmatter(readFileSync(file, 'utf8'));
   // La primera palabra del primer tipo de prueba (API, E2E, Visual) es la
-  // raíz del árbol de Allure.
+  // raíz del árbol de Allure; las pruebas contra Figma van en Style o Content.
   const testType = [meta.test_type].flat()[0]?.split(' ')[0] || undefined;
   const parent = meta.parent?.match(/^US-\d+$/)?.[0];
   let story;
@@ -256,8 +256,21 @@ function convertSuite(junitPath) {
   const platform = platformOf(junitPath);
   for (const tc of cases) {
     const spec = tc.tcId ? specFor(tc.tcId) : {};
+    // Una prueba contra Figma deja su reporte de comparación
+    // (<TC>-comparacion-estilos-figma.html o <TC>-comparacion-contenido-figma.html):
+    // es del tipo Style o Content aunque su especificación la clasifique como
+    // Visual Test o E2E.
+    const figmaKind = mediaForCase(media, reportDir, tc, attachments)
+      .map(
+        file => basename(file).match(/-comparacion-(estilos|contenido)-/)?.[1]
+      )
+      .find(Boolean);
+    const figmaType = { estilos: 'Style', contenido: 'Content' }[figmaKind];
     const labels = [
-      { name: 'parentSuite', value: spec.testType ?? 'E2E' },
+      {
+        name: 'parentSuite',
+        value: figmaType ?? spec.testType ?? 'E2E',
+      },
       { name: 'framework', value: 'katalon' },
       { name: 'suite', value: tc.suite },
     ];
@@ -288,7 +301,13 @@ function convertSuite(junitPath) {
       links: spec.workItemUrl
         ? [{ name: `TC-${tc.tcId}`, url: spec.workItemUrl, type: 'tms' }]
         : [],
-      attachments: [...attachApi(tc), ...attachMedia(tc), ...sharedLogs],
+      // La evidencia de una prueba API es su request y response (ADR-003): no
+      // lleva video ni capturas aunque el navegador estuviera grabando.
+      attachments: [
+        ...attachApi(tc),
+        ...((spec.testType ?? 'E2E') === 'API' ? [] : attachMedia(tc)),
+        ...sharedLogs,
+      ],
     };
     removePrevious(result.historyId);
     writeFileSync(

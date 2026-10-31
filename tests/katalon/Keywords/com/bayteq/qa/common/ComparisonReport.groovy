@@ -42,16 +42,36 @@ class ComparisonReport {
     String write(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows, Map<String, String> screenshots) {
         String folder = RunConfiguration.getReportFolder()
         File file = new File(folder, "${testCaseId}-comparacion-estilos-figma.html")
-        file.setText(html(testCaseId, meta, rows, screenshots, folder), 'UTF-8')
+        file.setText(html(testCaseId, meta, rows, screenshots, folder, 'estilos'), 'UTF-8')
         KeywordUtil.logInfo("Reporte de comparación con Figma: ${file.absolutePath}")
         file.absolutePath
     }
 
+    /**
+     * Escribe el reporte de comparación de contenido (textos) con Figma, como evidencia de la ejecución.
+     * Mismo formato que {@link #write}; el nombre del archivo lleva `comparacion-contenido-figma`, que es
+     * lo que usa junit-to-allure.mjs para clasificar el caso como Content.
+     *
+     * @param testCaseId ID del caso (p. ej. 'TC-1234'); forma parte del nombre del archivo
+     * @param meta datos de cabecera: título (Map de etiqueta a valor, en orden)
+     * @param rows resultados, cada uno con screen, element, node, property, figma, measured, tolerance y status
+     * @param screenshots capturas por pantalla: nombre de pantalla a nombre de archivo PNG en la carpeta del reporte
+     * @return la ruta absoluta del HTML generado
+     */
+    @Keyword
+    String writeContent(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows, Map<String, String> screenshots) {
+        String folder = RunConfiguration.getReportFolder()
+        File file = new File(folder, "${testCaseId}-comparacion-contenido-figma.html")
+        file.setText(html(testCaseId, meta, rows, screenshots, folder, 'contenido'), 'UTF-8')
+        KeywordUtil.logInfo("Reporte de comparación de contenido con Figma: ${file.absolutePath}")
+        file.absolutePath
+    }
+
     private static String html(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows,
-            Map<String, String> screenshots, String folder) {
+            Map<String, String> screenshots, String folder, String subject) {
         StringBuilder out = new StringBuilder()
-        out << "<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><title>${esc(testCaseId)} comparación con Figma</title>"
-        out << "<style>${STYLE}</style></head><body><h1>${esc(testCaseId)} - Comparación de estilos con Figma</h1>"
+        out << "<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><title>${esc(testCaseId)} comparación de ${subject} con Figma</title>"
+        out << "<style>${STYLE}</style></head><body><h1>${esc(testCaseId)} - Comparación de ${subject} con Figma</h1>"
         out << '<table class="meta">'
         meta.each { String key, String value -> out << "<tr><td>${esc(key)}</td><td>${esc(value)}</td></tr>" }
         out << '</table><h2>Resumen por pantalla</h2><table><tr><th>Pantalla</th><th>OK</th><th>Diferencias</th><th>No verificado</th></tr>'
