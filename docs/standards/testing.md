@@ -119,16 +119,19 @@ Si el sistema bajo prueba no permite borrar un recurso, la prueba no usa ese rec
 
 Toda ejecución automatizada **DEBE** producir evidencia, tanto si la prueba pasa como si falla. El keyword es [ApiRequest.send()](../../tests/katalon/Keywords/com/bayteq/qa/common/ApiRequest.groovy), que prefija los registros con `[API-REQUEST]` y `[API-RESPONSE]`; la conversión a Allure los adjunta a cada caso como "API request y response". Los casos de tipo API (`test_type: [API Test]` en su especificación) **NO DEBEN** llevar video ni capturas como evidencia en Allure, aunque el Screen Recorder del proyecto grabe la ejecución. El tipo de evidencia se selecciona según el tipo de prueba:
 
-| Tipo de prueba               | Evidencia                                                                                |
-| ---------------------------- | ---------------------------------------------------------------------------------------- |
-| E2E web (escritorio y móvil) | Log de ejecución paso a paso, captura automática al fallar y video de la ejecución       |
-| App nativa o híbrida         | Log de ejecución paso a paso, captura automática al fallar y capturas de los pasos clave |
-| API (REST y GraphQL)         | Request, response y verificaciones registrados explícitamente en el log                  |
-| Regresión visual             | Captura de la comparación                                                                |
+| Tipo de prueba               | Evidencia                                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| E2E web (escritorio y móvil) | Log de ejecución paso a paso, captura automática al fallar y video de la ejecución        |
+| App nativa o híbrida         | Log de ejecución paso a paso, captura automática al fallar y capturas de los pasos clave  |
+| API (REST y GraphQL)         | Request, response y verificaciones registrados explícitamente en el log                   |
+| Regresión visual             | Captura de la comparación                                                                 |
+| Style y Content (Figma)      | Reporte HTML de comparación, captura del elemento y un aviso `DIFERENCIA:` por diferencia |
 
 Las Test Suites de pruebas E2E web **DEBEN** grabar video de todas las ejecuciones, exitosas y fallidas, con el Screen Recorder de Katalon Studio. Las pruebas de apps móviles **DEBEN** tomar una captura en cada paso clave del flujo. El proyecto **DEBE** tener activada la captura automática al fallar.
 
 En las pruebas API, la petición **DEBE** enviarse con el Custom Keyword común de evidencia, que registra en el log el request (método, URL, headers relevantes y body), el response (status, headers relevantes y body) y las verificaciones con su resultado, tanto si la prueba pasa como si falla.
+
+Las pruebas contra el diseño de Figma (tipos Style y Content) **DEBEN** leer los valores medidos con [Styles](../../tests/katalon/Keywords/com/bayteq/qa/common/Styles.groovy) (`readCss()` o `readTexts()`), compararlos todos sin detenerse en el primero y dejar el reporte de comparación con [ComparisonReport](../../tests/katalon/Keywords/com/bayteq/qa/common/ComparisonReport.groovy): `write()` para estilos o `writeContent()` para textos. Cada diferencia **DEBE** registrarse con `KeywordUtil.markWarning("DIFERENCIA: elemento · propiedad: Figma x, medido y")` y la verificación **DEBE** hacerse una sola vez al final, con todas las diferencias en el mensaje. Una prueba de textos que usa solo `verifyElementText()` no deja el reporte y Allure la clasifica como E2E.
 
 La evidencia **DEBE** poder asociarse con el Test Case, la ejecución y el build, **DEBE** adjuntarse al reporte de Allure y al test run de Azure DevOps, y **DEBE** conservarse según la política de retención definida. Los logs y los resultados de ejecución **DEBEN** estar disponibles para todas las ejecuciones.
 
