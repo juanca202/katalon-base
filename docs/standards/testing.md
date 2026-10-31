@@ -29,7 +29,9 @@ Ninguna.
 
 Los casos de prueba **DEBEN** vivir en `tests/katalon/Test Cases/US-<id>/`, con su script en `Scripts/` y sus Test Objects en `Object Repository/US-<id>/`. Las Test Suites **DEBEN** vivir en `tests/katalon/Test Suites/US-<id>/`.
 
-El script de cada caso **DEBE** organizarse en tres bloques comentados: preparación, acción y verificación.
+El script de cada caso **DEBE** organizarse en tres bloques comentados: preparación, acción y verificación (`// ===== Preparación =====`, `// ===== Acción =====`, `// ===== Verificación =====`).
+
+Cada acción o verificación **DEBE** ir precedida de una sentencia de texto con su descripción (`'Paso 1: abrir la transacción: se muestra su detalle'`). Katalon registra esa sentencia como descripción del paso y el conversor a Allure ([scripts/katalon/junit-to-allure.mjs](../../scripts/katalon/junit-to-allure.mjs)) la usa como nombre del paso y en el mensaje de fallo; sin ella el reporte muestra llamadas técnicas (`openBrowser("")`, `verifyElementVisible(findTestObject(...))`). La descripción de cada paso sale de la especificación del caso en `docs/specs/`. Los Test Objects que se verifican **DEBEN** tener `<description>`, porque el mensaje de fallo la incluye.
 
 ### Excepciones
 
@@ -216,6 +218,8 @@ Ninguna.
 | CR-009 | test-types                | Todo Test Case **DEBE** declarar su tipo (Fully Automated o Human-in-the-Loop) y, si es Human-in-the-Loop, **DEBE** indicar en sus pasos qué input se ingresa manualmente | no            | —          | Pending      |
 | CR-010 | katalon-runner            | Las pruebas automatizadas **DEBEN** vivir en un proyecto de Katalon Studio en `tests/katalon/`, con su archivo `.prj`                                                     | yes           | bloqueante | Pending      |
 | CR-011 | execution-evidence        | Las Test Suites de pruebas E2E web **DEBEN** grabar video de todas las ejecuciones, exitosas y fallidas, y no solo de los casos fallidos                                  | yes           | bloqueante | Pending      |
+| CR-012 | test-structure            | El script de cada caso **DEBE** tener los bloques Preparación, Acción y Verificación                                                                                      | yes           | warning    | Pending      |
+| CR-013 | test-structure            | Cada bloque del script **DEBE** contener sentencias de descripción de paso (`'Paso N: …'`) para que el reporte de Allure muestre pasos legibles                           | yes           | warning    | Pending      |
 
 ## Referencias
 
