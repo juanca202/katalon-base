@@ -37,7 +37,7 @@ Incluir estos archivos en cada conversación para obtener contexto completo sobr
 ## Integración
 
 - **Script de publicación en Azure DevOps** - Tras cada ejecución local, crea el test run en el Test Plan y registra el resultado de cada `TC-<id>` (API REST de Azure DevOps)
-- **Servidores MCP** (`.mcp.json`) - Katalon Studio (local) y Azure DevOps (PAT en `ADO_BAY_JUA_PAT`) para agentes de IA
+- **Servidores MCP** (`.mcp.json`) - Katalon Studio (local) y Azure DevOps (PAT en `ADO_PAT_BAYTEQ`) para agentes de IA
 - **Husky 9.1.7** - Git hooks para pre-commit
 
 ## Sistema bajo prueba
