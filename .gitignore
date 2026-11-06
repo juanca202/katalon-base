@@ -45,4 +45,5 @@ Thumbs.db
 
 # SDD DevKit
 .sdd-devkit/.env
+.sdd-devkit/quality-check-run.json
 .allure/

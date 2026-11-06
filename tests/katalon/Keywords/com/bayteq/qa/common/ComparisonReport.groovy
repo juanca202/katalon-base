@@ -5,7 +5,7 @@ import com.kms.katalon.core.configuration.RunConfiguration
 import com.kms.katalon.core.util.KeywordUtil
 
 /**
- * Reporte HTML autocontenido de la comparación de estilos con Figma, como evidencia de la
+ * Reporte HTML autocontenido de la comparación con Figma, como evidencia de la
  * ejecución (ADR-003). Escribe un archivo y no contiene aserciones.
  */
 class ComparisonReport {
@@ -27,96 +27,119 @@ class ComparisonReport {
         .swatch { display: inline-block; width: 12px; height: 12px; border: 1px solid #888; margin-right: 6px; vertical-align: middle; }
         .meta td:first-child { font-weight: bold; width: 160px; background: #f0f0f0; }
         img { max-width: 360px; border: 1px solid #ccc; margin: 4px; }
+        .evidence-grid { display: flex; flex-wrap: wrap; gap: 16px; margin: 12px 0 24px; }
+        .evidence-grid figure { margin: 0; max-width: 360px; }
+        .evidence-grid figcaption { font-size: 12px; font-weight: bold; margin-bottom: 6px; }
     '''
 
     /**
-     * Escribe el reporte de comparación en la carpeta del reporte de la ejecución.
+     * Escribe el reporte de comparación de estilos en la carpeta del reporte de la ejecución.
      *
-     * @param testCaseId ID del caso (p. ej. 'TC-1234'); forma parte del nombre del archivo
-     * @param meta datos de cabecera: título (Map de etiqueta a valor, en orden)
-     * @param rows resultados, cada uno con screen, element, node, property, figma, measured, tolerance y status
-     * @param screenshots capturas por pantalla: nombre de pantalla a nombre de archivo PNG en la carpeta del reporte
-     * @return la ruta absoluta del HTML generado
+     * @param testCaseId ID del caso (p. ej. 'TC-1234')
+     * @param meta cabecera del reporte
+     * @param rows filas de comparación
+     * @param screenshots por pantalla: {@code reference} (Figma) y {@code measured} (captura probada), nombres de PNG en la carpeta del reporte
      */
     @Keyword
-    String write(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows, Map<String, String> screenshots) {
+    String write(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows, Map screenshots) {
         String folder = RunConfiguration.getReportFolder()
         File file = new File(folder, "${testCaseId}-comparacion-estilos-figma.html")
-        file.setText(html(testCaseId, meta, rows, screenshots, folder, 'estilos'), 'UTF-8')
+        file.setText(renderHtml(testCaseId, meta, rows, screenshots, folder, 'estilos'), 'UTF-8')
         KeywordUtil.logInfo("Reporte de comparación con Figma: ${file.absolutePath}")
         file.absolutePath
     }
 
     /**
-     * Escribe el reporte de comparación de contenido (textos) con Figma, como evidencia de la ejecución.
-     * Mismo formato que {@link #write}; el nombre del archivo lleva `comparacion-contenido-figma`, que es
-     * lo que usa junit-to-allure.mjs para clasificar el caso como Content.
-     *
-     * @param testCaseId ID del caso (p. ej. 'TC-1234'); forma parte del nombre del archivo
-     * @param meta datos de cabecera: título (Map de etiqueta a valor, en orden)
-     * @param rows resultados, cada uno con screen, element, node, property, figma, measured, tolerance y status
-     * @param screenshots capturas por pantalla: nombre de pantalla a nombre de archivo PNG en la carpeta del reporte
-     * @return la ruta absoluta del HTML generado
+     * Escribe el reporte de comparación de contenido (textos). El nombre del archivo usa
+     * {@code comparacion-contenido-figma}, que junit-to-allure.mjs usa para clasificar Content.
      */
     @Keyword
-    String writeContent(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows, Map<String, String> screenshots) {
+    String writeContent(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows, Map screenshots) {
         String folder = RunConfiguration.getReportFolder()
         File file = new File(folder, "${testCaseId}-comparacion-contenido-figma.html")
-        file.setText(html(testCaseId, meta, rows, screenshots, folder, 'contenido'), 'UTF-8')
+        file.setText(renderHtml(testCaseId, meta, rows, screenshots, folder, 'contenido'), 'UTF-8')
         KeywordUtil.logInfo("Reporte de comparación de contenido con Figma: ${file.absolutePath}")
         file.absolutePath
     }
 
-    private static String html(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows,
-            Map<String, String> screenshots, String folder, String subject) {
+    private static String renderHtml(String testCaseId, Map<String, String> meta, List<Map<String, String>> rows,
+            Map screenshots, String folder, String subject) {
         StringBuilder out = new StringBuilder()
-        out << "<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><title>${esc(testCaseId)} comparación de ${subject} con Figma</title>"
-        out << "<style>${STYLE}</style></head><body><h1>${esc(testCaseId)} - Comparación de ${subject} con Figma</h1>"
+        out << "<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><title>${escapeHtml(testCaseId)} comparación de ${subject} con Figma</title>"
+        out << "<style>${STYLE}</style></head><body><h1>${escapeHtml(testCaseId)} - Comparación de ${subject} con Figma</h1>"
         out << '<table class="meta">'
-        meta.each { String key, String value -> out << "<tr><td>${esc(key)}</td><td>${esc(value)}</td></tr>" }
+        for (Map.Entry<String, String> entry in meta.entrySet()) {
+            out << "<tr><td>${escapeHtml(entry.key)}</td><td>${escapeHtml(entry.value)}</td></tr>"
+        }
         out << '</table><h2>Resumen por pantalla</h2><table><tr><th>Pantalla</th><th>OK</th><th>Diferencias</th><th>No verificado</th></tr>'
         List<String> screens = rows*.screen.unique()
-        screens.each { String screen ->
-            out << "<tr><td>${esc(screen)}</td>"
-            [OK, DIFFERENCE, NOT_VERIFIED].each { String status ->
+        for (String screen in screens) {
+            out << "<tr><td>${escapeHtml(screen)}</td>"
+            for (String status in [OK, DIFFERENCE, NOT_VERIFIED]) {
                 out << "<td>${rows.count { it.screen == screen && it.status == status }}</td>"
             }
             out << '</tr>'
         }
         out << '</table>'
-        screens.each { String screen ->
-            out << "<h2>${esc(screen)}</h2><table><tr><th>Pantalla</th><th>Elemento</th><th>Nodo Figma</th><th>Propiedad</th>" +
+        for (String screen in screens) {
+            out << "<h2>${escapeHtml(screen)}</h2><table><tr><th>Pantalla</th><th>Elemento</th><th>Nodo Figma</th><th>Propiedad</th>" +
                     '<th>Valor Figma</th><th>Valor medido</th><th>Tolerancia</th><th>Estado</th></tr>'
-            rows.findAll { it.screen == screen }.each { Map<String, String> row ->
-                out << "<tr class=\"${row.status.replace(' ', '')}\"><td>${esc(row.screen)}</td><td>${esc(row.element)}</td>" +
-                        "<td>${esc(row.node)}</td><td>${esc(row.property)}</td><td>${value(row.figma)}</td><td>${value(row.measured)}</td>" +
-                        "<td>${esc(row.tolerance)}</td><td>${ICONS[row.status]} ${esc(row.status)}</td></tr>"
+            for (Map<String, String> row in rows.findAll { it.screen == screen }) {
+                out << "<tr class=\"${row.status.replace(' ', '')}\"><td>${escapeHtml(row.screen)}</td><td>${escapeHtml(row.element)}</td>" +
+                        "<td>${escapeHtml(row.node)}</td><td>${escapeHtml(row.property)}</td><td>${formatValue(row.figma)}</td>" +
+                        "<td>${formatValue(row.measured)}</td><td>${escapeHtml(row.tolerance)}</td>" +
+                        "<td>${ICONS[row.status]} ${escapeHtml(row.status)}</td></tr>"
             }
             out << '</table>'
-            if (screenshots[screen]) {
-                out << image(folder, screenshots[screen])
-            }
+            Object screenEvidence = screenshots?.get(screen)
+            out << evidenceSectionHtml(folder, screenEvidence)
         }
         out << '</body></html>'
         out.toString()
     }
 
-    private static String value(String text) {
-        String safe = esc(text)
+    private static String evidenceSectionHtml(String folder, Object screenEvidence) {
+        if (screenEvidence == null) {
+            return ''
+        }
+        if (screenEvidence instanceof String) {
+            return "<h3>Evidencia visual</h3>${embedPng(folder, screenEvidence as String)}"
+        }
+        if (!(screenEvidence instanceof Map)) {
+            return ''
+        }
+        Map evidence = screenEvidence as Map
+        StringBuilder block = new StringBuilder('<h3>Evidencia visual</h3><div class="evidence-grid">')
+        appendFigure(block, folder, 'Referencia (Figma)', evidence.reference as String)
+        String measured = (evidence.measured ?: evidence.element) as String
+        appendFigure(block, folder, 'Elemento probado', measured)
+        block << '</div>'
+        block.toString()
+    }
+
+    private static void appendFigure(StringBuilder block, String folder, String caption, String fileName) {
+        if (!fileName) {
+            return
+        }
+        block << "<figure><figcaption>${escapeHtml(caption)}</figcaption>${embedPng(folder, fileName)}</figure>"
+    }
+
+    private static String formatValue(String text) {
+        String safe = escapeHtml(text)
         (text ==~ COLOR_PATTERN) ? "<span class=\"swatch\" style=\"background:${safe}\"></span>${safe}" : safe
     }
 
-    private static String image(String folder, String name) {
+    private static String embedPng(String folder, String name) {
         File png = new File(folder, name)
         if (!png.isFile()) {
-            return ''
+            return "<p><em>${escapeHtml(name)} (no encontrado)</em></p>"
         }
         String source = png.length() <= MAX_EMBEDDED_BYTES ?
-                'data:image/png;base64,' + png.bytes.encodeBase64() : esc(name)
-        "<p><img src=\"${source}\" alt=\"${esc(name)}\"></p>"
+                'data:image/png;base64,' + png.bytes.encodeBase64() : escapeHtml(name)
+        "<p><img src=\"${source}\" alt=\"${escapeHtml(name)}\"></p>"
     }
 
-    private static String esc(String text) {
+    private static String escapeHtml(String text) {
         (text ?: '').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
     }
 

@@ -29,29 +29,29 @@ class ApiRequest {
         KeywordUtil.logInfo("${REQUEST_TAG} ${describeRequest(request)}")
         ResponseObject response = WS.sendRequest(request, FailureHandling.CONTINUE_ON_FAILURE)
         KeywordUtil.logInfo("${RESPONSE_TAG} ${describeResponse(response)}")
-        return response
+        response
     }
 
     private static String describeRequest(RequestObject request) {
         String headers = request.httpHeaderProperties.collect { "${it.name}: ${maskSecret(it.name, it.value)}" }.join('\n')
         // Una petición sin cuerpo (p. ej. GET) tiene bodyContent nulo y getHttpBody() falla
         String body = request.bodyContent == null ? '' : request.httpBody
-        return "${request.restRequestMethod} ${request.restUrl}\n${headers}\n\n${truncate(body)}"
+        "${request.restRequestMethod} ${request.restUrl}\n${headers}\n\n${truncate(body)}"
     }
 
     private static String describeResponse(ResponseObject response) {
         String headers = response.headerFields.collect { name, values -> "${name}: ${values.join(', ')}" }.join('\n')
-        return "${response.statusCode} (${response.elapsedTime} ms)\n${headers}\n\n${truncate(response.responseText)}"
+        "${response.statusCode} (${response.elapsedTime} ms)\n${headers}\n\n${truncate(response.responseText)}"
     }
 
     private static String maskSecret(String name, String value) {
-        return name?.toLowerCase() in ['authorization', 'cookie', 'x-api-key'] ? '***' : value
+        name?.toLowerCase() in ['authorization', 'cookie', 'x-api-key'] ? '***' : value
     }
 
     private static String truncate(String body) {
         if (!body || body.length() <= MAX_BODY) {
             return body ?: ''
         }
-        return body.substring(0, MAX_BODY) + '... (truncado)'
+        body.substring(0, MAX_BODY) + '... (truncado)'
     }
 }

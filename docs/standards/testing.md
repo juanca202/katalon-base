@@ -2,14 +2,14 @@
 name: Testing Standards
 domain: testing
 status: Active
-last_update: 2026-10-26
-source_adrs: [ADR-002, ADR-003, ADR-004, ADR-005, ADR-006, ADR-007]
+last_update: 2026-11-06
+source_adrs: [ADR-002, ADR-003, ADR-004, ADR-005, ADR-006, ADR-007, ADR-013]
 tags: [testing, katalon, allure, azure-devops, human-in-the-loop, test-data]
 ---
 
 # Testing Standards
 
-Este estándar cubre las pruebas automatizadas del framework de QA con Katalon Studio: runner, estructura de pruebas, esperas, aserciones, reintentos, tiempos, datos de prueba, evidencias de ejecución, trazabilidad con Test Cases de Azure DevOps, reportería con Allure, jerarquía Historia, Criterio y Caso de prueba, y tipos de prueba (Fully Automated y Human-in-the-Loop).
+Este estándar cubre las pruebas automatizadas del framework de QA con Katalon Studio: runner, estructura de pruebas, esperas, aserciones, reintentos, tiempos, datos de prueba, evidencias de ejecución, trazabilidad con Test Cases de Azure DevOps, reportería con Allure, jerarquía Historia, Criterio y Caso de prueba, tipos de prueba web (E2E, regresión visual, Style y Content), y tipos de automatización (Fully Automated y Human-in-the-Loop).
 
 ## Runner de pruebas: Katalon
 
@@ -32,6 +32,30 @@ Los casos de prueba **DEBEN** vivir en `tests/katalon/Test Cases/US-<id>/`, con 
 El script de cada caso **DEBE** organizarse en tres bloques comentados: preparación, acción y verificación (`// ===== Preparación =====`, `// ===== Acción =====`, `// ===== Verificación =====`).
 
 Cada acción o verificación **DEBE** ir precedida de una sentencia de texto con su descripción (`'Paso 1: abrir la transacción: se muestra su detalle'`). Katalon registra esa sentencia como descripción del paso y el conversor a Allure ([scripts/katalon/junit-to-allure.mjs](../../scripts/katalon/junit-to-allure.mjs)) la usa como nombre del paso y en el mensaje de fallo; sin ella el reporte muestra llamadas técnicas (`openBrowser("")`, `verifyElementVisible(findTestObject(...))`). La descripción de cada paso sale de la especificación del caso en `docs/specs/`. Los Test Objects que se verifican **DEBEN** tener `<description>`, porque el mensaje de fallo la incluye.
+
+### Excepciones
+
+Ninguna.
+
+## Tipos de prueba web: E2E, regresión visual, Style y Content
+
+**ID:** web-test-kinds
+**Estado:** Active
+
+En el árbol de Allure (nivel **Tipo**, `parentSuite`) conviene no mezclar cuatro familias distintas:
+
+| Tipo en Allure                | Qué valida                                                                       | Evidencia típica                                                                                                                                                         | Notas                                                                                                         |
+| ----------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| **E2E**                       | Flujo funcional (comportamiento, navegación, reglas de negocio)                  | Log, captura al fallar, video ([ADR-003](../adr/ADR-003-katalon-execution-evidence.md))                                                                                  | `test_type: [E2E]` u omitir comparación Figma.                                                                |
+| **Visual** (regresión visual) | Que la UI coincida píxel a píxel (o con tolerancia) con una imagen de referencia | Captura actual, baseline e imagen de diferencias ([ADR-013](../adr/ADR-013-visual-regression.md))                                                                        | No es comparación numérica con Figma; las líneas base viven en `Include/visual-baselines/`.                   |
+| **Style**                     | Propiedades CSS medidas vs valores de Figma                                      | `TC-<id>-comparacion-estilos-figma.html` ([ComparisonReport](../../tests/katalon/Keywords/com/bayteq/qa/common/ComparisonReport.groovy) `write()`), avisos `DIFERENCIA:` | En Allure **no** va bajo «Visual»: va bajo **Style** ([ADR-004](../adr/ADR-004-katalon-allure-reporting.md)). |
+| **Content**                   | Textos (u otros contenidos declarados) medidos vs Figma                          | `TC-<id>-comparacion-contenido-figma.html` (`writeContent()`), avisos `DIFERENCIA:`                                                                                      | En Allure **no** va bajo «Visual»: va bajo **Content**.                                                       |
+
+**Style** y **Content** comparan **valores medidos en el DOM** con el diseño (Figma); la **regresión visual** compara **imágenes**. El conversor a Allure distingue Style/Content por el nombre del HTML adjunto (`comparacion-estilos-figma` / `comparacion-contenido-figma`), no por la palabra «visual» en el informe. Una sección titulada «Evidencia visual» dentro del HTML de comparación Figma solo agrupa capturas de apoyo; **no convierte el caso en regresión visual**.
+
+Los helpers reutilizables para **Style** y **Content** viven bajo `tests/katalon/Keywords/com/bayteq/qa/common/`: [BrowserSession](../../tests/katalon/Keywords/com/bayteq/qa/common/BrowserSession.groovy), [BrowserTheme](../../tests/katalon/Keywords/com/bayteq/qa/common/BrowserTheme.groovy), [BrowserViewport](../../tests/katalon/Keywords/com/bayteq/qa/common/BrowserViewport.groovy), [Styles](../../tests/katalon/Keywords/com/bayteq/qa/common/Styles.groovy), [ScreenshotEvidence](../../tests/katalon/Keywords/com/bayteq/qa/common/ScreenshotEvidence.groovy), [ComparisonReport](../../tests/katalon/Keywords/com/bayteq/qa/common/ComparisonReport.groovy).
+
+El caso móvil llama a `BrowserViewport.emulateMobile(width, height)` y después a `BrowserSession.prepareLight()`. Cada keyword hace una sola acción ([ADR-008](../adr/ADR-008-groovy-code-style-codenarc.md)). `ScreenshotEvidence` solo lee imágenes dentro de `Include/` y solo escribe dentro de la carpeta del reporte de la ejecución.
 
 ### Excepciones
 

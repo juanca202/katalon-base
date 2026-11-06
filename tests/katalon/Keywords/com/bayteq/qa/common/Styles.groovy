@@ -13,7 +13,7 @@ import com.kms.katalon.core.webui.driver.DriverFactory
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 
 /**
- * Lectura de estilos CSS calculados para la comparación con Figma (ADR-013). Cada método hace una
+ * Lectura de estilos y textos calculados para compararlos con Figma (tipos Style y Content; ADR-004). Cada método hace una
  * sola lectura y no contiene aserciones: la comparación con el valor de Figma la hace el caso.
  */
 class Styles {
