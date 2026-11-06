@@ -21,7 +21,11 @@
     "prepare": "husky",
     "quality:check": "npm run lint && npm run format:check",
     "arch": "node scripts/arch/verify.mjs",
-    "ado:publish": "node scripts/katalon/publish-to-ado.mjs",
+    "ado:test-runs:publish": "node scripts/ado/test-runs/publish.mjs",
+    "ado:env:init": "node scripts/ado/env/init.mjs",
+    "ado:work-items:get": "node scripts/ado/work-items/get.mjs",
+    "ado:test-cases:upsert": "node scripts/ado/test-cases/upsert.mjs",
+    "ado:test-cases:delete": "node scripts/ado/test-cases/delete.mjs",
     "codenarc": "gradle -p tests/katalon -q codenarc"
   },
   "keywords": [],
