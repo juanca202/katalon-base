@@ -5,14 +5,23 @@
 //
 // Se pueden indicar ids sueltos, un Test Plan (todos los casos de sus suites)
 // o ambos. Un caso presente en varias suites se borra una sola vez. El plan
-// no se toma de ADO_TEST_PLAN_ID: hay que pasarlo con --plan.
+// no se toma de ADO_TEST_PLAN_ID: hay que pasarlo con --plan, o como id suelto
+// (un id que resulta ser un Test Plan se trata como --plan).
+//
+// Con un Test Plan se borran sus Test Cases y después el propio plan (con sus
+// suites); --keep-plan conserva el plan. Si algún caso no se pudo borrar, el
+// plan no se elimina para poder reintentar.
+//
+// Con npm hay que separar los argumentos del script con "--":
+//   npm run ado:test-cases:delete -- --plan 1234
 //
 // Configuración: igual que el resto de scripts/ado (projectManagement de
 // .sdd-devkit/settings.json y ADO_PAT). El PAT necesita Test Management
 // (Read & write).
 //
 // Uso: node scripts/ado/test-cases/delete.mjs [opciones] [<id>...]
-//   --plan <id>   Borra los Test Cases de ese Test Plan
+//   --plan <id>   Borra los Test Cases de ese Test Plan y el plan
+//   --keep-plan   No elimina el Test Plan, solo sus Test Cases
 //   <id>          Uno o más Test Cases (1234, #1234 o TC-1234)
 //   --dry-run     Lista lo que se borraría, sin eliminar
 import { createClient } from '../lib/client.mjs';
@@ -21,12 +30,14 @@ import { fail, loadAdoSettings, loadDotEnv } from '../lib/config.mjs';
 const API = 'api-version=7.1';
 const PAGE = 200;
 const TEST_CASE_TYPES = new Set(['Test Case', 'Caso de prueba']);
+const TEST_PLAN_TYPES = new Set(['Test Plan', 'Plan de pruebas']);
 const USAGE =
-  'Uso: delete.mjs [--plan <id>] [<id>...] [--dry-run]\n' +
+  'Uso: delete.mjs [--plan <id>] [<id>...] [--keep-plan] [--dry-run]\n' +
+  '  Con npm: npm run ado:test-cases:delete -- --plan <id>\n' +
   '  <id> admite 1234, #1234 o TC-1234.';
 
 function parseArgs(argv) {
-  const args = { plan: null, ids: [], dryRun: false };
+  const args = { plan: null, ids: [], dryRun: false, keepPlan: false };
   const value = i => {
     if (argv[i + 1] === undefined)
       fail(`Falta el valor de ${argv[i]}.\n${USAGE}`);
@@ -39,6 +50,9 @@ function parseArgs(argv) {
         break;
       case '--dry-run':
         args.dryRun = true;
+        break;
+      case '--keep-plan':
+        args.keepPlan = true;
         break;
       default:
         if (argv[i].startsWith('--'))
@@ -131,10 +145,12 @@ async function describe(workItemIds) {
 
 const selected = new Map();
 const problems = [];
+const plans = new Map();
 
-let plan = null;
-if (args.plan !== null) {
-  plan = await ado('GET', `/testplan/plans/${args.plan}?${API}`);
+async function collectPlan(planId) {
+  if (plans.has(Number(planId))) return;
+  const plan = await ado('GET', `/testplan/plans/${planId}?${API}`);
+  plans.set(plan.id, plan);
   for (const suite of await listSuites(plan.id)) {
     for (const tc of await casesInSuite(plan.id, suite.id)) {
       selected.set(tc.id, tc);
@@ -142,8 +158,10 @@ if (args.plan !== null) {
   }
 }
 
+if (args.plan !== null) await collectPlan(args.plan);
+
 if (ids.length > 0) {
-  const pending = ids.filter(id => !selected.has(id));
+  const pending = ids.filter(id => !selected.has(id) && !plans.has(id));
   const described = await describe(pending);
   for (const id of pending) {
     const item = described.get(id);
@@ -151,8 +169,14 @@ if (ids.length > 0) {
       problems.push(`#${id}: no existe.`);
       continue;
     }
+    if (TEST_PLAN_TYPES.has(item.type)) {
+      await collectPlan(id);
+      continue;
+    }
     if (!TEST_CASE_TYPES.has(item.type)) {
-      problems.push(`#${id} es «${item.type}», no un Test Case.`);
+      problems.push(
+        `#${id} es «${item.type}», no un Test Case ni un Test Plan.`
+      );
       continue;
     }
     selected.set(id, { id, title: item.title });
@@ -160,15 +184,15 @@ if (ids.length > 0) {
 }
 
 const cases = [...selected.values()].sort((a, b) => a.id - b.id);
-if (plan) {
+const prefix = args.dryRun ? '[dry-run] ' : '';
+for (const plan of plans.values()) {
   console.log(
-    `${args.dryRun ? '[dry-run] ' : ''}Test Plan ${plan.id} «${plan.name}»`
+    `${prefix}Test Plan ${plan.id} «${plan.name}»${args.keepPlan ? ' (se conserva)' : ' (se eliminará al final)'}`
   );
-} else if (args.dryRun) {
-  console.log('[dry-run]');
 }
+if (plans.size === 0 && args.dryRun) console.log('[dry-run]');
 for (const problem of problems) console.log(`Omitido: ${problem}`);
-if (cases.length === 0 && problems.length === 0) {
+if (cases.length === 0 && problems.length === 0 && plans.size === 0) {
   console.log('No hay Test Cases para borrar.');
   process.exit(0);
 }
@@ -186,6 +210,19 @@ for (const tc of cases) {
     failures++;
     console.error(`Error #${tc.id}: ${error.message}`);
   }
+}
+if (!args.keepPlan && failures === 0) {
+  for (const plan of plans.values()) {
+    try {
+      await ado('DELETE', `/testplan/plans/${plan.id}?${API}`);
+      console.log(`Eliminado Test Plan ${plan.id}: ${plan.name}`);
+    } catch (error) {
+      failures++;
+      console.error(`Error Test Plan ${plan.id}: ${error.message}`);
+    }
+  }
+} else if (!args.keepPlan && plans.size > 0) {
+  console.log('Test Plan no eliminado: hubo errores; corrige y reintenta.');
 }
 console.log(`Eliminados: ${deleted}. Errores: ${failures}`);
 if (failures > 0) process.exit(1);

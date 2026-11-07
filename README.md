@@ -96,7 +96,7 @@ Katalon Studio, en su edición gratuita, es el runner único de pruebas para web
 - `npm run ado:env:init` - Pide el PAT por consola (se muestra enmascarado, solo los últimos 4 caracteres), crea `.env` desde `.env.example` y lo guarda en `ADO_PAT` (si `.env` ya existe, solo actualiza esa línea)
 - `npm run ado:work-items:get -- <id> [<id>...]` - Descarga work items (`ADO_PAT`; opciones como en el proyecto de pruebas)
 - `npm run ado:test-cases:upsert` - Crea o actualiza Test Cases desde `docs/specs` (`ADO_PAT`; `-- --dry-run`, etc.)
-- `npm run ado:test-cases:delete` - Borra Test Cases en Azure DevOps (`ADO_PAT`; `-- --dry-run`, `-- --plan <id>`)
+- `npm run ado:test-cases:delete -- <id>...` - Borra Test Cases en Azure DevOps (`ADO_PAT`; `--dry-run` para revisar). Con un Test Plan (`-- --plan <id>`, o su id suelto) borra sus Test Cases y luego el plan; `--keep-plan` lo conserva. Con npm los argumentos van tras `--`
 - `npm run allure:generate` / `npm run allure:serve` / `npm run allure:open` - Generar, generar y abrir, o abrir el reporte de Allure
 - `npm run lint` / `npm run lint:fix` - ESLint sobre `scripts/`
 - `npm run format` / `npm run format:check` - Prettier sobre `scripts/`
